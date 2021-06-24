@@ -20,3 +20,9 @@
 - file name: household-type.csv
 - file path: data/census/household-type.csv
 
+## Accommodation type
+- Table ID (Reference): QS402EW
+- source: https://www.nomisweb.co.uk/census/2011/qs402ew
+- [file url](https://www.nomisweb.co.uk/api/v01/dataset/nm_534_1.bulk.csv?time=latest&measures=20100&rural_urban=total&geography=TYPE297)
+- file name: accommodation_type-households.csv
+- file path: data/census/accommodation_type-households.csv
