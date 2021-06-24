@@ -26,3 +26,10 @@
 - [file url](https://www.nomisweb.co.uk/api/v01/dataset/nm_534_1.bulk.csv?time=latest&measures=20100&rural_urban=total&geography=TYPE297)
 - file name: accommodation_type-households.csv
 - file path: data/census/accommodation_type-households.csv
+
+## Workday population
+- Table ID (Reference): WD601EW
+- source: https://www.nomisweb.co.uk/census/2011/wd601ew
+- [file url](https://www.nomisweb.co.uk/api/v01/dataset/nm_942_1.bulk.csv?time=latest&measures=20100&geography=TYPE297)
+- file name: economic_activity_workday.csv
+- file path: data/census/economic_activity_workday.csv
