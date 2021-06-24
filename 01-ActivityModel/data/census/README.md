@@ -13,3 +13,10 @@
 - file name: tenure-households.csv
 - file path: data/census/tenure-households.csv
 
+## Single family dwellings
+- Table ID (Reference): QS116EW
+- source: https://www.nomisweb.co.uk/census/2011/qs116ew
+- [file url](https://www.nomisweb.co.uk/api/v01/dataset/nm_516_1.bulk.csv?time=latest&measures=20100&rural_urban=total&geography=TYPE297)
+- file name: household-type.csv
+- file path: data/census/household-type.csv
+
