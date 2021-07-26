@@ -30,7 +30,7 @@ Icons made by <a href="https://www.flaticon.com/authors/prosymbols" title="Prosy
 
 ---
 
-Icons made by [Freepik](https://www.freepik.com) from [www.flaticon.com](https://www.flaticon.com/)
+Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
 
 * `001-puzzle.svg`
 * `002-feminism.svg`
@@ -55,3 +55,9 @@ Icons made by [Freepik](https://www.freepik.com) from [www.flaticon.com](https:/
 * `026-biological-clock.svg`
 * `027-time-management.sv`
 * `028-losses.svg`
+
+---
+
+Icons made by <a href="https://www.flaticon.com/authors/vitaly-gorbachev" title="Vitaly Gorbachev">Vitaly Gorbachev</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+
+* `029-database.svg`
