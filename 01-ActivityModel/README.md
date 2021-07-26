@@ -22,3 +22,9 @@ This model will enable us to test hypotheses about variations in energy demand a
     <img src="inputs/01-flow.png" alt="DAME main steps" width="70%">
     <p style="font-size:0.75em;"> Icons made by <a href="https://www.flaticon.com/authors/vitaly-gorbachev" title="Vitaly Gorbachev">Vitaly Gorbachev</a> and <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></p>
 </div>
+
+### Phase 1
+
+Collect all necessary data:
+
+* Geographic information
