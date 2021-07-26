@@ -10,3 +10,4 @@
 
 In this folder you will find the **Dynamic Activity Model for Energy** (DAME), a spatial microsimulation model (MSM) of people’s presence and their daily activities (e.g. commuting, shopping, education, leisure, etc.) at a high resolution.
 
+The model will create a synthetic representation of all individuals and households in a study area, combining information from the UK Census of Population as well as a large travel survey (the UK Time Use Survey). In this manner, synthetic individuals will be imbued with socio-demographic characteristics and, importantly, information about how they spend their time during a ‘normal’ day. The model is built on the SPENSER (a spatial MSM for Great Britain3,4) framework and includes people and their activities while present in residential buildings and away from home.
