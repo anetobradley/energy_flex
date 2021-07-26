@@ -17,5 +17,6 @@ The model will create a synthetic representation of all individuals and househol
 This model will enable us to test hypotheses about variations in energy demand and their relationship with household composition and their socio-economic-demographic features.
 
 ## Project steps
-
-![DAME main steps](inputs/01-flow.png)
+<p align="center">
+    <img src="inputs/01-flow.png" alt="DAME main steps" width="500">
+</p>
