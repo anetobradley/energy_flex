@@ -30,10 +30,13 @@ This model will enable us to test hypotheses about variations in energy demand a
 In principle, the necessary information are:
 
 * Geographic information
-* Economic activity
-* Indices of deprivation
-* Household type
-* Tenure
-* Accommodation type
-* Accommodation energy efficiency information
-* Time use
+* Socio-economic information
+* Household information
+* Accommodation information
+* Time use information
+
+### Phase 2
+
+> In **Phase 2** the data is used to model a synthetic representation of all individuals in a study area. The model will be built on the SPENSER (a spatial MSM for Great Britain) framework. The synthetic individuals will be imbued with socio-demographic characteristics and, importantly, information about how they spend their time during a ‘normal’ day.
+
+
