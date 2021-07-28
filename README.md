@@ -53,5 +53,5 @@ explicitly and will allow new transport policies related to (e.g.) electric vehi
 
 
 ## Table of Contents
-1. [Activity Model](01-ActivityModel/)
+1. [Dynamic Activity Model for Energy](01-ActivityModel/)
 2. [Energy Model](02-EnergyModel/)
