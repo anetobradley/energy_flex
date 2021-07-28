@@ -37,6 +37,13 @@ In principle, the necessary information are:
 
 ### Phase 2
 
-> In **Phase 2** the data is used to model a synthetic representation of all individuals in a study area. The model will be built on the SPENSER (a spatial MSM for Great Britain) framework. The synthetic individuals will be imbued with socio-demographic characteristics and, importantly, information about how they spend their time during a ‘normal’ day.
+> In **Phase 2** the data is used to model a synthetic representation of all individuals in a study area. 
 
+* The model will be built on the SPENSER (a spatial MSM for Great Britain) framework. 
+* The synthetic individuals will be imbued with socio-demographic characteristics and, importantly, information about how they spend their time during a ‘normal’ day.
 
+### Phase 3
+
+> In **Phase 3** the synthetic population will be connect with households.
+
+* This model will enable us to test hypotheses about variations in energy demand and their relationship with household composition and their socio-economic-demographic features.
