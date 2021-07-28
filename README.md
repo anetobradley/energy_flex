@@ -1,26 +1,33 @@
-# Towards A Flexible, Sustainable Urban Energy System Project
+<!-- PROJECT SHIELDS -->
+<!-- Contributors and license will update when the repo is public.
+     project page need to be included manually -->
+<p align="center">
+    <a href="https://github.com/anetobradley/energy_flex/graphs/contributors" alt="Contributors">
+        <img src="https://img.shields.io/github/contributors/anetobradley/energy_flex?color=%2366FFC3&logo=GitHub&logoColor=%2366FFC3&style=for-the-badge" /></a>
+     <a href="https://github.com/anetobradley/energy_flex/blob/main/LICENSE" alt="License">
+        <img src="https://img.shields.io/github/license/anetobradley/energy_flex?color=FFB3BC&style=for-the-badge" /></a>
+    <a href="#"  alt="Project page">
+        <img src="https://img.shields.io/badge/-🌐Project Page-black.svg?style=for-the-badge&logo=🌐&colorB=555&logoColor=99F4FB" /></a>
+</p>
+
 
 ## Authors
+
 * Dr Ruchi Choudhary
-    * Reader, Department of Engineering, University of Cambridge, UK.
-    * [More information](http://www.eng.cam.ac.uk/profiles/rc488)
-
+  * Reader, Department of Engineering, University of Cambridge, UK.
+  * [More information](http://www.eng.cam.ac.uk/profiles/rc488)
 * Dr Brian Matthews
-    *  Group Leader, DAFNI and Data Science and Technology Group, Scientific Computing Department of the Science and Technology Facilities Council.
-    * [More information](https://www.scd.stfc.ac.uk/Pages/Brian-Matthews.aspx)
- 
+  * Group Leader, DAFNI and Data Science and Technology Group, Scientific Computing Department of the Science and Technology Facilities Council.
+  * [More information](https://www.scd.stfc.ac.uk/Pages/Brian-Matthews.aspx)
 * Dr Nicolas Malleson
-    * Professor of Spatial Science, University of Leeds, UK.
-    * [More information](http://www.nickmalleson.co.uk/)
-
-
+  * Professor of Spatial Science, University of Leeds, UK.
+  * [More information](http://www.nickmalleson.co.uk/)
 * Dr André Paul Neto-Bradley
-    * PDRA, Department of Engineering, University of Cambridge, Cambridge, UK
-    * [More information](https://www.eeci.cam.ac.uk/directory/a-neto-bradley)
-
+  * PDRA, Department of Engineering, University of Cambridge, Cambridge, UK
+  * [More information](https://www.eeci.cam.ac.uk/directory/a-neto-bradley)
 * Dr Patricia Ternes
-    * Research Fellow, School of Geography, University of Leeds, UK
-    * [More information](https://patricia-ternes.github.io/)
+  * Research Fellow, School of Geography, University of Leeds, UK
+  * [More information](https://patricia-ternes.github.io/)
 
 ## Abstract
 Energy flexibility is key to delivering a reliable, sustainable energy system. Unexpected peaks in demand put
