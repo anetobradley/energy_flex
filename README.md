@@ -10,6 +10,13 @@
         <img src="https://img.shields.io/badge/-🌐Project Page-black.svg?style=for-the-badge&logo=🌐&colorB=555&logoColor=99F4FB" /></a>
 </p>
 
+<!-- PROJECT LOGO -->
+<br />
+<p align="center">
+    <img src="01-ActivityModel/inputs/icons/001-puzzle.svg" alt="Logo" width="15% id="logo">
+    <p  align="center" style="font-size:0.75em;">Icon made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></p>
+    <h1 align="center">Towards A Flexible, Sustainable Urban Energy System Project</h1>
+</p>
 
 ## Authors
 
