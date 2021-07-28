@@ -25,6 +25,15 @@ This model will enable us to test hypotheses about variations in energy demand a
 
 ### Phase 1
 
-Collect all necessary data:
+> In **Phase 1** all necessary data is identified, collected, cleaned and organized.
+
+In principle, the necessary information are:
 
 * Geographic information
+* Economic activity
+* Indices of deprivation
+* Household type
+* Tenure
+* Accommodation type
+* Accommodation energy efficiency information
+* Time use
