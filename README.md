@@ -56,15 +56,15 @@ also lay the groundwork for a more comprehensive agent-based model that will inc
 explicitly and will allow new transport policies related to (e.g.) electric vehicle use to be modelled.
 
 ## Keywords
+
 * Energy flexibility
 * Energy demand
 * Urban analytics
 * Sustainability
 
-
 ## Methodology
 
-
+<!-- add here the methodology -->
 
 ## Table of Contents
 1. [Dynamic Activity Model for Energy](01-ActivityModel/)
