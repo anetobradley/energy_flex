@@ -4,6 +4,15 @@ This energy model adapts the previously developed quasi-steady state SUSDEM resi
 
 This model takes as inputs the following data:
 
-- NEED Energy Intensity Profiles
-- EPC Certificates from area of interest
+- NEED Household Microdata: https://www.gov.uk/government/statistics/national-energy-efficiency-data-framework-need-anonymised-data-2019
+- EPC Certificates from local authority of interest
 - Any additional high resolution data available for calibration
+
+## Step 1: Estimate Energy Intensity Distributions
+
+The first step of this model involves combining national data with EPCs from local authorities to estimate a distribution for energy intensity.
+
+
+## Step 2: Calibration
+
+## Step 3: Retrofit Analysis
