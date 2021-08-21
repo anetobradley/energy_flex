@@ -12,6 +12,8 @@ This model takes as inputs the following data:
 
 The first step of this model involves combining national data with EPCs from local authorities to estimate a distribution for energy intensity.
 
+![image](https://user-images.githubusercontent.com/66263560/130320020-e4f37ee9-db1a-40e8-a7b4-9a97068bec3e.png)
+
 
 ## Step 2: Calibration
 
