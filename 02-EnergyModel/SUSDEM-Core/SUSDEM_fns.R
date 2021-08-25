@@ -894,15 +894,31 @@ else if((DwellingType == 1 || DwellingType == 3)  && (DwellingPosition == 0 || D
 
     # NEED TO ADAPT THIS ONCE WORKING
     #Create objects with dwelling/system/occupant properties; based on EPC inputs and assumptions
-    [geometry, envelope, constructions, hvac, appliances, lights, occupancy, weather, SP, Constants, Coefficients] = Inputs(Inputs1, Inputs2, Inputs3, Inputs4); #calls input file and populates input data
+    #  (geometry, envelope, constructions, hvac, appliances, lights, occupancy, weather, SP, Constants, Coefficients) =
+    Outputs <- Inputs(Inputs1, Inputs2, Inputs3, Inputs4); #calls input file and populates input data
     
-    TimeLength = length(Constants.Time); #creates variable that is equal to the number of timesteps
+    input_geometry <- Outputs[[1]]
+    input_envelope <- Outputs[[2]]
+    input_constructions <- Outputs[[3]]
+    input_hvac <- Outputs[[4]]
+    input_appliances <- Outputs[[5]]
+    input_lights <- Outputs[[6]]
+    input_occupancy <- Outputs[[7]]
+    input_weather <- Outputs[[8]]
+    input_SP <- Outputs[[9]]
+    input_Constants <- Outputs[[10]]
+    input_Coefficients <- Outputs[[11]]
+    
+    
+    TimeLength = nrow(input_Constants@Time) #creates variable that is equal to the number of timesteps
     #e.g. for monthly timesteps over a year, TimeLength = 12 (12 months in a year)
     #e.g. for hourly timesteps over a day, TimeLength = 24 (24 hours in a day)
     #Default is monthly timesteps
-    DaysPerMonth[,1]=1./Constants.Time[,3]; #calculates days per month
+    DaysPerMonth=1./input_Constants@Time[,3]; #calculates days per month
     
-    c(Toh, Toc) = Temperatures(weather.ExternalTemp, weather.GroundTemp, SP.THeating, SP.TCooling, TimeLength, DwellingType, DwellingPosition);
+    Temps = Temperature(input_weather@ExternalTemp, input_weather@GroundTemp, input_SP@THeating, input_SP@TCooling, TimeLength, DwellingType, DwellingPosition);
+    Toh = matrix(Temps$`V1`,nrow=4)
+    Toc = matrix(Temps$V1,nrow=4)
     #populates matrix of external temperatures / boundary temperatures for heating and cooling periods
     #based on dwelling type and dwelling position
     #matrix order is:
@@ -910,7 +926,7 @@ else if((DwellingType == 1 || DwellingType == 3)  && (DwellingPosition == 0 || D
         #temperature above dwelling (either external or internal depending on dwelling type/location);
         #temperature below dwelling (either external or internal depending on dwelling type/location)]
     
-    Ht = CondCoefficient (constructions.ExternalWall, constructions.InternalWall, constructions.Glazing1, constructions.Glazing2, constructions.Door, constructions.Roof, constructions.Floor, envelope.Walls, envelope.Glazing1, envelope.Glazing2, envelope.Doors, geometry.RoofArea, geometry.GroundArea, envelope.ExternalSurfaces, envelope.InternalSurfaces); 
+    Ht = CondCoefficient (input_constructions@ExternalWall, input_constructions@InternalWall, input_constructions@Glazing1, input_constructions@Glazing2, input_constructions@Door, input_constructions@Roof, input_constructions@Floor, input_envelope@Walls, input_envelope@Glazing1, input_envelope@Glazing2, input_envelope@Doors, input_geometry@RoofArea, input_geometry@GroundArea, input_envelope@ExternalSurfaces, input_envelope@InternalSurfaces) 
     #calculates conduction heat transfer coefficient (see SAP 2009, Appendix K)
     
     [QcondH, QcondC] = ConductionLoss(Ht, SP.THeating, SP.TCooling, Toh, Toc, Constants.Time(:,1));
@@ -1064,18 +1080,18 @@ Inputs <- function(Inputs1, Inputs2, Inputs3, Inputs4){
   coefficients = new("Coefficients") #calls coefficients class
   input_geometry = geometry(Inputs1[1,2], Inputs3[,1], Inputs3[,2], Inputs3[,3]) # creates geometry object and populates it
   input_envelope = envelope(input_geometry@FacadeArea, Inputs2[1,2], Inputs2[1,3], Inputs1[1,3], Inputs1[1,4], coefficients@DoorSize, Inputs1[1,15]) # creates envelope object and populates it
-  input_constructions = Constructions(Inputs2(1,5),Inputs2(1,20), Inputs2(1,21),Inputs2(1,6), Inputs2(1,15), Inputs2(1,16), Inputs1(1,5), Inputs2(1,4), Inputs2(1,7), Inputs2(1,10), Inputs2(1,8), Inputs2(1,1), Inputs2(1,2),geometry.GroundArea, geometry.GroundPerimeter); # creates constructions object and populates it
-  input_hvac = HVAC(Inputs2(1,11),Inputs1(1,14),Inputs1(1,13),Inputs1(1,9),Inputs1(1,12),Inputs2(1,12),Inputs2(1,13),Inputs2(1,14),Inputs1(1,10),1,2,Inputs2(1,2),Inputs1(1,11),Inputs2(1,21)) # creates HVAC object and populates it
-  appliances = Appliances(Inputs2(1,19),Inputs2(1,22)) #creates appliances object and populates it
-  lights = Lights(Inputs2(1,9),coefficients.PI,Inputs1(1,6),1, Inputs2(1,17)) #creates lighting object and populates it
-  occupancy = Occupants(Inputs2(1,18)) #creates occupancy profile object and populates it
+  input_constructions = constructions(Inputs2[1,5],Inputs2[1,20], Inputs2[1,21],Inputs2[1,6], Inputs2[1,15], Inputs2[1,16], Inputs1[1,5], Inputs2[1,4], Inputs2[1,7], Inputs2[1,10], Inputs2[1,8], Inputs2[1,1], Inputs2[1,2],input_geometry@GroundArea, input_geometry@GroundPerimeter) # creates constructions object and populates it
+  input_hvac = hvac(Inputs2[1,11],Inputs1[1,14],Inputs1[1,13],Inputs1[1,9],Inputs1[1,12],Inputs2[1,12],Inputs2[1,13],Inputs2[1,14],Inputs1[1,10],1,2,Inputs2[1,2],Inputs1[1,11],Inputs2[1,21]) # creates HVAC object and populates it
+  input_appliances = appliances(Inputs2[1,19],Inputs2[1,22]) #creates appliances object and populates it
+  input_lights = lights(Inputs2[1,9],coefficients@PI,Inputs1[1,6],1, Inputs2[1,17]) #creates lighting object and populates it
+  input_occupancy = occupancy(Inputs2[1,18]) #creates occupancy profile object and populates it
   
-  weather = Weather(t(Inputs4(:,1)),Inputs4(:,2:end), [17 17 18 18 18 19 19 19 18 18 17 17]); #creates weather object and populates it
-  SP = SetPoint (Inputs1(1,7),Inputs1(1,8),16); #creates set-point object and populates it
+  input_weather = weather(t(Inputs4[,1]),Inputs4[,c(2:length(colnames(Inputs4)))], c(17,17,18,18,18,19,19,19,18,18,17,17)) #creates weather object and populates it
+  input_SP = SP(Inputs1[1,7],Inputs1[1,8],16); #creates set-point object and populates it
 
 
-return(c(geometry, envelope, constructions, hvac, appliances, lights, occupancy, weather, SP, Constants, Coefficients))
-
+return(c(input_geometry, input_envelope, input_constructions, input_hvac, input_appliances, input_lights, input_occupancy, input_weather, input_SP, constants, coefficients))
+  #### Translated to here.
 }
 
 
@@ -1098,7 +1114,6 @@ Temperature <-  function(Text, Tground, SPheat, SPcool, TimeLength, DwellingType
     TbelowC = rep(1,TimeLength)*SPcool; # temperature below is internal temperature of heating/cooling set point
   }
     
-  
   if(DwellingType == 0 || DwellingType == 2 || DwellingPosition == 6){
     TaboveH = Text; # temperature above is external temperature (specified in weather file)
     TaboveC = Text;
@@ -1111,10 +1126,10 @@ Temperature <-  function(Text, Tground, SPheat, SPcool, TimeLength, DwellingType
   TintH = rep(1,TimeLength)*SPheat; #internal spaces (i.e. neighbouring spaces) are at the set point temperature
   TintC = rep(1,TimeLength)*SPcool;
   
-  Toh = rbind(Text, TintH, TaboveH, TbelowH)
-  Toc = rbind(Text, TintC, TaboveC, TbelowC)
+  Toh = as.data.frame(matrix(c(Text, TintH, TaboveH, TbelowH)))
+  Toc = as.data.frame(matrix(c(Text, TintC, TaboveC, TbelowC)))
 
-  return(Toh,Toc)
+  return(c(Toh,Toc))#Toc
   
 }
 
@@ -1129,17 +1144,17 @@ CondCoefficient <- function(Uew, Uiw, Ug1, Ug2, Udoor, Uroof, Ufloor, Aw, Ag1, A
   # Ux = U-value (W/m^2K) of component x
   # Ax = Area (m^2) of component x
   # Surface = vector of surfaces (1 or 0) by orientation (N,NE...W,NW)
-  y = 0.15;
+  y = 0.15
   
-  HtExt = ((y+Uew)*Aw + (y+Ug1)*Ag1 + (y+Ug2)*Ag2 + (y+Udoor)*Adoor)*t(SurfacesExt) #calculates Ht for vertical external surfaces (walls, glazing, doors)
+  HtExt = ((y+Uew)*Aw + (y+Ug1)*Ag1 + (y+Ug2)*Ag2 + (y+Udoor)*Adoor)*(SurfacesExt) #calculates Ht for vertical external surfaces (walls, glazing, doors)
   
-  HtInt = (Uiw*Aw + Ug1*Ag1 + Ug2*Ag2 + Udoor*Adoor)*t(SurfacesInt) #calculates Ht for vertical internal surfaces (walls, glazing, doors)
+  HtInt = (Uiw*Aw + Ug1*Ag1 + Ug2*Ag2 + Udoor*Adoor)*(SurfacesInt) #calculates Ht for vertical internal surfaces (walls, glazing, doors)
   
   HtRoof = (y+Uroof)*Aroof #calculates Ht for horizontal surfaces (roof/ceiling, floor)
   
   HtFloor = (y+Ufloor)*Afloor
   
-  Ht = rbind(HtExt, HtInt, HtRoof, HtFloor] #matrix of conduction heat transfer coefficients
+  Ht = matrix(c(HtExt, HtInt, HtRoof, HtFloor)) #matrix of conduction heat transfer coefficients
 
   return(Ht)
 }
