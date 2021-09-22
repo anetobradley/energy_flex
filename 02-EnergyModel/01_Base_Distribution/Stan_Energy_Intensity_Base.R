@@ -31,7 +31,7 @@ require(dplyr)
 
 # Load data from NEED csv
 
-NEED_data <- read.csv("anon_set_50k_2019.csv", header=T, stringsAsFactors = F)
+NEED_data <- read.csv(url("https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/857035/anon_set_50k_2019.csv"), header=T, stringsAsFactors = F)
 
 # Assign group numbers based on Building Type and Age
 typology_parser <- function(x,y){
@@ -106,6 +106,8 @@ typology_parser <- function(x,y){
   }
   else if(x=="Semi detached" && y==104){
     type = 24
+  }else{
+    type=NA
   }
 }
 
@@ -146,30 +148,34 @@ require(ggplot2)
 
 #ggplot(NEED_data_typecast) + geom_density(aes(x=E_INT), fill = "#C7DED2") + facet_grid(PROP_TYPE ~ PROP_AGE_FINAL) + xlim(0,80) + xlab("Electricity Energy Intensity kWh/m^2/year")+theme_minimal()
 
-ggplot(NEED_data_typecast) + geom_density(aes(x=E_INT+G_INT, group=IMD_band, colour=IMD_band)) + facet_grid(PROP_TYPE ~ PROP_AGE_FINAL) + xlim(0,300) + xlab("Gas Energy Intensity kWh/m^2/year")+ theme_minimal()
+#ggplot(NEED_data_typecast) + geom_density(aes(x=E_INT+G_INT, group=IMD_band, colour=IMD_band)) + facet_grid(PROP_TYPE ~ PROP_AGE_FINAL) + xlim(0,300) + xlab("Gas Energy Intensity kWh/m^2/year")+ theme_minimal()
 
 #ggplot(NEED_data_typecast) + geom_col(aes(y=mean(E_INT+G_INT), x=IMD_band, colour=IMD_band)) + facet_grid(PROP_TYPE ~ PROP_AGE_FINAL) + xlim(0,6) + xlab("Gas Energy Intensity kWh/m^2/year")+ theme_minimal()
 
 NEED_INEQ <- NEED_data_typecast %>% group_by(PROP_TYPE,PROP_AGE_FINAL,IMD_band) %>% summarise(E = mean(E_INT+G_INT)) 
 
-ggplot(NEED_INEQ) + geom_col(aes(y=E, x=IMD_band, fill=IMD_band)) +
-   facet_grid(PROP_TYPE ~ PROP_AGE_FINAL, scales = "free_y") + xlim(0,6) + xlab("IMD from 1 (most deprived) to 5 (least deprived)")+ theme_minimal()
+#ggplot(NEED_INEQ) + geom_col(aes(y=E, x=IMD_band, fill=IMD_band)) +
+#  facet_grid(PROP_TYPE ~ PROP_AGE_FINAL, scales = "free_y") + xlim(0,6) + xlab("IMD from 1 (most deprived) to 5 (least deprived)")+ theme_minimal()
 
 # EPC DATA PROCESSING #####
 # Fetch and process EPC certificates for a given area.
 
-source(EPC_Search_Fn.R)
+source("EPC_Search_Fn.R")
 
 # Need to match age bands (approximately)
 
 epc_df_cl <- filter(epc_df, `construction-age-band` != "")
 epc_df_cl <- filter(epc_df_cl, `construction-age-band` != "NO DATA!")
+epc_df_cl <- filter(epc_df_cl, `construction-age-band` != "INVALID!")
 
 epc_age_band_convert <- function(epc_age){
   if(epc_age == "2018"){
     NEED_AGE_BANDS <- 104
   }
   else if(epc_age == "2020"){
+    NEED_AGE_BANDS <- 104
+  }
+  else if(epc_age == "2019"){
     NEED_AGE_BANDS <- 104
   }
   else if(epc_age == "2021"){
@@ -213,6 +219,8 @@ epc_age_band_convert <- function(epc_age){
   }
   else if(epc_age == "England and Wales: 1996-2002"){
     NEED_AGE_BANDS <- 103
+  }else{
+    NEED_AGE_BANDS <- NA
   }
 }
 
@@ -260,10 +268,15 @@ epc_built_type_convert <- function(epc_type, epc_form){
   }
   else if(epc_type=="Maisonette" && epc_form == "Semi-Detached"){
     built_type = "Semi detached"
+  }else{
+    built_type <- NA
   }
 }
 
 epc_df_cl$NEED_TYPE <- as.vector(unlist(mapply(epc_built_type_convert, epc_type=epc_df_cl$`property-type`,  epc_form = epc_df_cl$`built-form`)))
+
+epc_df_cl <- filter(epc_df_cl,!is.na(`NEED_TYPE`))
+epc_df_cl <- filter(epc_df_cl,!is.na(`NEED_AGE_BANDS`))
 
 epc_df_cl$group <- as.vector((mapply(typology_parser, x=epc_df_cl$NEED_TYPE, y=epc_df_cl$NEED_AGE_BANDS)))
 
@@ -275,107 +288,123 @@ NEED_Plot <- data.frame("NEED_TYPE"=NEED_data_typecast$PROP_TYPE, "NEED_AGE_BAND
 
 ggplot() + geom_density(data= epc_df_cl, aes(x=as.numeric(`energy-consumption-current`)), fill = "#C7DED2")+  geom_density(data=NEED_Plot, aes(x=E_TOT), fill = "#C700D2", alpha=0.5) + facet_grid(NEED_TYPE ~ NEED_AGE_BANDS, scales = "free_y") + xlim(0,500) + xlab("Energy Intensity kWh/m^2/year")+theme_minimal()
 
+save(NEED_Plot, file="/data/base_dist_posterior.Rdata")
 
+head(NEED_Plot)
+print("Worflow Finished")
 # STAN MODEL INPUTS #####
 
-set.seed(2019)
+# set.seed(2019)
 
-library(rstan)
-library(bayesplot)
+# library(rstan)
+# library(bayesplot)
 
-options(mc.cores = parallel::detectCores())
-rstan_options(auto_write = TRUE)
-Sys.setenv(LOCAL_CPPFLAGS = '-march=corei7 -mtune=corei7')
+# options(mc.cores = parallel::detectCores())
+# rstan_options(auto_write = TRUE)
+# #Sys.setenv(LOCAL_CPPFLAGS = '-march=corei7 -mtune=corei7')
 
-# APPLY SQRT NORMALISATION #
+# # APPLY SQRT NORMALISATION #
 
-NEED_data_typecast$E_TOT_sqrt <- sqrt(NEED_data_typecast$E_TOT)
-NEED_data_typecast$E_TOT_normal <- (NEED_data_typecast$E_TOT_sqrt - mean(NEED_data_typecast$E_TOT_sqrt))/sd(NEED_data_typecast$E_TOT_sqrt)
+# NEED_data_typecast$E_TOT_sqrt <- sqrt(NEED_data_typecast$E_TOT)
+# NEED_data_typecast$E_TOT_normal <- (NEED_data_typecast$E_TOT_sqrt - mean(NEED_data_typecast$E_TOT_sqrt))/sd(NEED_data_typecast$E_TOT_sqrt)
 
-epc_df_cl$E_CONS_sqrt <- sqrt(as.numeric(epc_df_cl$`energy-consumption-current`))
-epc_df_cl$E_CONS_normal <- (epc_df_cl$E_CONS_sqrt - mean(NEED_data_typecast$E_TOT_sqrt))/sd(NEED_data_typecast$E_TOT_sqrt)
+# epc_df_cl <- filter(epc_df_cl, as.numeric(epc_df_cl$`energy-consumption-current`) >= 0)
+# epc_df_cl$E_CONS_sqrt <- sqrt(as.numeric(epc_df_cl$`energy-consumption-current`))
+# epc_df_cl$E_CONS_normal <- (epc_df_cl$E_CONS_sqrt - mean(NEED_data_typecast$E_TOT_sqrt))/sd(NEED_data_typecast$E_TOT_sqrt)
 
 
-# LOAD AND EXECUTE MCMC SAMPLING #
+# # LOAD AND EXECUTE MCMC SAMPLING #
+# samples_mcmc <- as.numeric(Sys.getenv("MCMC_SAMPLES"))
 
-epc_priors <- stanc(file = "EPC_Prior_Sampling.stan") # Check Stan file
-epc_priors_model <- stan_model(stanc_ret = epc_priors)
-epc_priors_haringey<- sampling(epc_priors_model, iter=400, seed=2019, warmup=100,
-                                            cores = 1, 
-                                            chains=2,
-                                            refresh = 50,
-                                            data=list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
-                                                      M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
-                                                      T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
-                                                      E_N = NEED_data_typecast$E_TOT_normal ,
-                                                      E_M = epc_df_cl$E_CONS_normal,
-                                                      sigma_N = 1,
-                                                      tn = as.numeric(NEED_data_typecast$group),
-                                                      tm = as.numeric(epc_df_cl$group)
-                                                      ),
-                                            control = list(#max_treedepth = 10,
-                                                           adapt_delta = 0.8)
-)
+# if(samples_mcmc > 4000){
+#   warmup_mcmc <- 1000
+# } else {
+#   warmup_mcmc <- (samples_mcmc*0.25)
+# }
 
-#save(epc_priors_haringey, file="20210817_EPC_Haringey_Prior.RData")
+# chains_mcmc <- as.numeric(Sys.getenv("MCMC_CHAINS"))
 
-# EXTRACT DATAFRAME FROM MODEL OUTPUTS FOR PLOTS #
 
-epc_mcmc_dist <- epc_priors_haringey %>% 
-  rstan::extract()  
+# epc_priors <- stanc(file = "EPC_Prior_Sampling.stan") # Check Stan file
+# epc_priors_model <- stan_model(stanc_ret = epc_priors)
+# epc_priors_haringey<- sampling(epc_priors_model, iter=samples_mcmc, seed=2019, warmup=warmup_mcmc,
+#                                             chains=4,
+#                                             refresh = 100,
+#                                             data=list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
+#                                                       M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
+#                                                       T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
+#                                                       E_N = NEED_data_typecast$E_TOT_normal ,
+#                                                       E_M = epc_df_cl$E_CONS_normal,
+#                                                       sigma_N = 1,
+#                                                       tn = as.numeric(NEED_data_typecast$group),
+#                                                       tm = as.numeric(epc_df_cl$group)
+#                                                       ),
+#                                             control = list(#max_treedepth = 10,
+#                                                            adapt_delta = 0.8
+#                                                            )
+# )
 
-E_prior_mean <- as.data.frame(epc_mcmc_dist$E)
-E_prior_mean$sigma <- (epc_mcmc_dist$sigma)
+# #save(epc_priors_haringey, file="20210817_EPC_Haringey_Prior.RData")
 
-reverse_convert <- function(mu,sig){
-  eint <- ((rnorm(1,mu,sig)*sd(NEED_data_typecast$E_TOT_sqrt))+mean(NEED_data_typecast$E_TOT_sqrt))^2
-}
+# # EXTRACT DATAFRAME FROM MODEL OUTPUTS FOR PLOTS #
 
-E_posterior <- as.data.frame(lapply(colnames(as.data.frame(epc_mcmc_dist$E)), function(i){mapply(reverse_convert, mu=E_prior_mean[,i], sig=E_prior_mean$sigma)}))
-colnames(E_posterior) <- c(1:24)
+# epc_mcmc_dist <- epc_priors_haringey %>% 
+#   rstan::extract()  
 
-require(reshape2)
+# E_prior_mean <- as.data.frame(epc_mcmc_dist$E)
+# E_prior_mean$sigma <- (epc_mcmc_dist$sigma)
 
-E_posterior_plot <- melt(E_posterior)
-colnames(E_posterior_plot) <- c("group","E_POS")
-E_posterior_plot$group <- as.numeric(as.character(E_posterior_plot$group))
+# reverse_convert <- function(mu,sig){
+#   eint <- ((rnorm(1,mu,sig)*sd(NEED_data_typecast$E_TOT_sqrt))+mean(NEED_data_typecast$E_TOT_sqrt))^2
+# }
 
-group_names <- list(
-  "1" = "Bungalow, pre-1930",
-  "2" = "Bungalow, 1930-72",
-  "3" = "Bungalow, 1972-99",
-  "4" = "Bungalow, post-2000",
-  "5" = "Detached, pre-1930",
-  "6" = "Detached, 1930-72",
-  "7" = "Detached, 1972-99",
-  "8" = "Detached, post-2000",
-  "9" = "End Terrace, pre-1930",
-  "10" = "End Terrace, 1930-72",
-  "11" = "End Terrace, 1972-99",
-  "12" = "End Terrace, post-2000",
-  "13" = "Flat, pre-1930",
-  "14" = "Flat, 1930-72",
-  "15" = "Flat, 1972-99",
-  "16" = "Flat, post-2000",
-  "17" = "Mid Terrace, pre-1930",
-  "18" = "Mid Terrace, 1930-72",
-  "19" = "Mid Terrace, 1972-99",
-  "20" = "Mid Terrace, post-2000",
-  "21" = "Semi Detached, pre-1930",
-  "22" = "Semi Detached, 1930-72",
-  "23" = "Semi Detached, 1972-99",
-  "24" = "Semi Detached, post-2000"
-)
+# E_posterior <- as.data.frame(lapply(colnames(as.data.frame(epc_mcmc_dist$E)), function(i){mapply(reverse_convert, mu=E_prior_mean[,i], sig=E_prior_mean$sigma)}))
+# colnames(E_posterior) <- c(1:24)
 
-facet_labeller <- function(variable,value){
-  return(group_names[value])
-}
+# require(reshape2)
 
-ggplot() + stat_density(data= epc_df_cl, aes(x=as.numeric(`energy-consumption-current`), color="Local Authority EPCs", linetype="Local Authority EPCs"), size = 1,geom="line",position="identity")+  
-  stat_density(data=NEED_Plot, aes(x=E_TOT, color="NEED Prior", linetype="NEED Prior"), size = 1,geom="line",position="identity") +
-  stat_density(data=E_posterior_plot, aes(x=E_POS, color="Posterior", linetype="Posterior"), size = 1,geom="line",position="identity") + 
-  scale_color_manual(labels= c("Local Authority EPCs","NEED Prior","Posterior"), values=c("#C7DED2","#67a684","#C700D2"), name="Legend")+
-  scale_linetype_manual(labels= c("Local Authority EPCs","NEED Prior","Posterior"), values=c(4,3,1), name="Legend")+
-  facet_wrap(~group, scales = "free_y", ncol = 4, labeller = facet_labeller) +
-  xlim(0,500) + 
-  xlab("Energy Intensity kWh/m^2/year")+theme_minimal()
+# E_posterior_plot <- melt(E_posterior)
+# colnames(E_posterior_plot) <- c("group","E_POS")
+# E_posterior_plot$group <- as.numeric(as.character(E_posterior_plot$group))
+
+# group_names <- list(
+#   "1" = "Bungalow, pre-1930",
+#   "2" = "Bungalow, 1930-72",
+#   "3" = "Bungalow, 1972-99",
+#   "4" = "Bungalow, post-2000",
+#   "5" = "Detached, pre-1930",
+#   "6" = "Detached, 1930-72",
+#   "7" = "Detached, 1972-99",
+#   "8" = "Detached, post-2000",
+#   "9" = "End Terrace, pre-1930",
+#   "10" = "End Terrace, 1930-72",
+#   "11" = "End Terrace, 1972-99",
+#   "12" = "End Terrace, post-2000",
+#   "13" = "Flat, pre-1930",
+#   "14" = "Flat, 1930-72",
+#   "15" = "Flat, 1972-99",
+#   "16" = "Flat, post-2000",
+#   "17" = "Mid Terrace, pre-1930",
+#   "18" = "Mid Terrace, 1930-72",
+#   "19" = "Mid Terrace, 1972-99",
+#   "20" = "Mid Terrace, post-2000",
+#   "21" = "Semi Detached, pre-1930",
+#   "22" = "Semi Detached, 1930-72",
+#   "23" = "Semi Detached, 1972-99",
+#   "24" = "Semi Detached, post-2000"
+# )
+
+# facet_labeller <- function(variable,value){
+#   return(group_names[value])
+# }
+
+# ggplot() + stat_density(data= epc_df_cl, aes(x=as.numeric(`energy-consumption-current`), color="Local Authority EPCs", linetype="Local Authority EPCs"), size = 1,geom="line",position="identity")+  
+#   stat_density(data=NEED_Plot, aes(x=E_TOT, color="NEED Prior", linetype="NEED Prior"), size = 1,geom="line",position="identity") +
+#   stat_density(data=E_posterior_plot, aes(x=E_POS, color="Posterior", linetype="Posterior"), size = 1,geom="line",position="identity") + 
+#   scale_color_manual(labels= c("Local Authority EPCs","NEED Prior","Posterior"), values=c("#C7DED2","#67a684","#C700D2"), name="Legend")+
+#   scale_linetype_manual(labels= c("Local Authority EPCs","NEED Prior","Posterior"), values=c(4,3,1), name="Legend")+
+#   facet_wrap(~group, scales = "free_y", ncol = 4, labeller = facet_labeller) +
+#   xlim(0,500) + 
+#   xlab("Energy Intensity kWh/m^2/year")+theme_minimal() + ggsave("/data/outputs/base_distribution.png", width = 16, height = 16, dpi = 200)
+
+# save(E_posterior, file="/data/outputs/posterior/base_dist_posterior.Rdata")

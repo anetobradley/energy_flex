@@ -1,0 +1,50 @@
+# 01-base-distribution-model-definition.yml
+
+kind: Model
+api_version: v1beta1
+
+metadata:
+  display_name: UK Household Energy Instensity Distribution Sampler
+  name: 01-base-distribution
+  summary: MCMC Sampling of Household Energy Intensity for a Local Authority using national NEED statistics and available local EPCs.
+  publisher: A P Neto-Bradley
+  description: >
+    This model uses Stan to sample posterior distributions for different housing typology energy intensities.
+
+    This uses a national sample survey (NEED) as a prior and pulls available EPCs for the local authority of interest to infer the distribution of energy intensities.
+
+    The user can specify the local authority to sample, as well as sampling paramaters to be passed on to the Stan sampler.
+
+spec:
+  inputs:
+    parameters:
+      - name: LOCAL_AUTHORITY
+        title: Local Authority ID
+        description: The ID Code for the Local Authority of Interest
+        type: character
+        default: "E09000014"
+        required: true
+
+      - name: MCMC_SAMPLES
+        title: Number of MCMC Samples
+        description: No. of iterations for each chain of the MCMC sampling.
+        type: integer
+        default: 4000
+        min: 400
+        max: 10000
+        required: true
+
+     - name: MCMC_CHAINS
+        title: Number of MCMC Chains
+        description: No. of samples for each chain of the MCMC sampling.
+        type: integer
+        default: 4
+        min: 1
+        max: 16
+        required: true
+  
+  outputs:
+    dataslots:
+      - name: Posterior Samples
+        description: Posterior samples of energy intensity for each household typology 
+        path: outputs/posterior
