@@ -1,6 +1,7 @@
 FROM rocker/verse
 
 RUN mkdir /code/
+RUN mkdir /data/
 RUN mkdir /data/outputs/
 COPY . /code/
 WORKDIR /code/
@@ -27,14 +28,15 @@ RUN install2.r --error --deps TRUE \
 
 RUN Rscript /code/install_packages.R
 
-ARG CHAINS
-ARG SAMPLES
-ARG AUTHORITY
+# ARG CHAINS
+# ARG SAMPLES
+# ARG AUTHORITY
 
-ENV LOCAL_AUTHORITY ${AUTHORITY}
-ENV MCMC_SAMPLES ${SAMPLES}
-ENV MCMC_CHAINS ${CHAINS}
+# ENV LOCAL_AUTHORITY ${AUTHORITY}
+# ENV MCMC_SAMPLES ${SAMPLES}
+# ENV MCMC_CHAINS ${CHAINS}
 
 CMD Rscript /code/Stan_Energy_Intensity_Base.R 
+#CMD sleep 24h
 
 

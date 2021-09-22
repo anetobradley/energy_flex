@@ -327,7 +327,7 @@ chains_mcmc <- as.numeric(Sys.getenv("MCMC_CHAINS"))
 epc_priors <- stanc(file = "EPC_Prior_Sampling.stan") # Check Stan file
 epc_priors_model <- stan_model(stanc_ret = epc_priors)
 epc_priors_haringey<- sampling(epc_priors_model, iter=samples_mcmc, seed=2019, warmup=warmup_mcmc,
-                                            chains=4,
+                                            chains=chains_mcmc,
                                             refresh = 100,
                                             data=list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
                                                       M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
@@ -408,4 +408,4 @@ E_posterior_plot$group <- as.numeric(as.character(E_posterior_plot$group))
 
 head(E_posterior)
 print("Worflow Finished")
-save(E_posterior, file="/data/outputs/posterior/base_dist_posterior.Rdata")
+save(E_posterior, file="/data/outputs/base_dist_posterior.Rdata")
