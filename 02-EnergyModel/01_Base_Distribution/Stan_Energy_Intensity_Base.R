@@ -290,82 +290,81 @@ ggplot() + geom_density(data= epc_df_cl, aes(x=as.numeric(`energy-consumption-cu
 
 save(NEED_Plot, file="/data/base_dist_posterior.Rdata")
 
-head(NEED_Plot)
-print("Worflow Finished")
+
 # STAN MODEL INPUTS #####
 
-# set.seed(2019)
+set.seed(2019)
 
-# library(rstan)
-# library(bayesplot)
+library(rstan)
+library(bayesplot)
 
-# options(mc.cores = parallel::detectCores())
-# rstan_options(auto_write = TRUE)
-# #Sys.setenv(LOCAL_CPPFLAGS = '-march=corei7 -mtune=corei7')
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+#Sys.setenv(LOCAL_CPPFLAGS = '-march=corei7 -mtune=corei7')
 
-# # APPLY SQRT NORMALISATION #
+# APPLY SQRT NORMALISATION #
 
-# NEED_data_typecast$E_TOT_sqrt <- sqrt(NEED_data_typecast$E_TOT)
-# NEED_data_typecast$E_TOT_normal <- (NEED_data_typecast$E_TOT_sqrt - mean(NEED_data_typecast$E_TOT_sqrt))/sd(NEED_data_typecast$E_TOT_sqrt)
+NEED_data_typecast$E_TOT_sqrt <- sqrt(NEED_data_typecast$E_TOT)
+NEED_data_typecast$E_TOT_normal <- (NEED_data_typecast$E_TOT_sqrt - mean(NEED_data_typecast$E_TOT_sqrt))/sd(NEED_data_typecast$E_TOT_sqrt)
 
-# epc_df_cl <- filter(epc_df_cl, as.numeric(epc_df_cl$`energy-consumption-current`) >= 0)
-# epc_df_cl$E_CONS_sqrt <- sqrt(as.numeric(epc_df_cl$`energy-consumption-current`))
-# epc_df_cl$E_CONS_normal <- (epc_df_cl$E_CONS_sqrt - mean(NEED_data_typecast$E_TOT_sqrt))/sd(NEED_data_typecast$E_TOT_sqrt)
-
-
-# # LOAD AND EXECUTE MCMC SAMPLING #
-# samples_mcmc <- as.numeric(Sys.getenv("MCMC_SAMPLES"))
-
-# if(samples_mcmc > 4000){
-#   warmup_mcmc <- 1000
-# } else {
-#   warmup_mcmc <- (samples_mcmc*0.25)
-# }
-
-# chains_mcmc <- as.numeric(Sys.getenv("MCMC_CHAINS"))
+epc_df_cl <- filter(epc_df_cl, as.numeric(epc_df_cl$`energy-consumption-current`) >= 0)
+epc_df_cl$E_CONS_sqrt <- sqrt(as.numeric(epc_df_cl$`energy-consumption-current`))
+epc_df_cl$E_CONS_normal <- (epc_df_cl$E_CONS_sqrt - mean(NEED_data_typecast$E_TOT_sqrt))/sd(NEED_data_typecast$E_TOT_sqrt)
 
 
-# epc_priors <- stanc(file = "EPC_Prior_Sampling.stan") # Check Stan file
-# epc_priors_model <- stan_model(stanc_ret = epc_priors)
-# epc_priors_haringey<- sampling(epc_priors_model, iter=samples_mcmc, seed=2019, warmup=warmup_mcmc,
-#                                             chains=4,
-#                                             refresh = 100,
-#                                             data=list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
-#                                                       M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
-#                                                       T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
-#                                                       E_N = NEED_data_typecast$E_TOT_normal ,
-#                                                       E_M = epc_df_cl$E_CONS_normal,
-#                                                       sigma_N = 1,
-#                                                       tn = as.numeric(NEED_data_typecast$group),
-#                                                       tm = as.numeric(epc_df_cl$group)
-#                                                       ),
-#                                             control = list(#max_treedepth = 10,
-#                                                            adapt_delta = 0.8
-#                                                            )
-# )
+# LOAD AND EXECUTE MCMC SAMPLING #
+samples_mcmc <- as.numeric(Sys.getenv("MCMC_SAMPLES"))
 
-# #save(epc_priors_haringey, file="20210817_EPC_Haringey_Prior.RData")
+if(samples_mcmc > 4000){
+  warmup_mcmc <- 1000
+} else {
+  warmup_mcmc <- (samples_mcmc*0.25)
+}
 
-# # EXTRACT DATAFRAME FROM MODEL OUTPUTS FOR PLOTS #
+chains_mcmc <- as.numeric(Sys.getenv("MCMC_CHAINS"))
 
-# epc_mcmc_dist <- epc_priors_haringey %>% 
-#   rstan::extract()  
 
-# E_prior_mean <- as.data.frame(epc_mcmc_dist$E)
-# E_prior_mean$sigma <- (epc_mcmc_dist$sigma)
+epc_priors <- stanc(file = "EPC_Prior_Sampling.stan") # Check Stan file
+epc_priors_model <- stan_model(stanc_ret = epc_priors)
+epc_priors_haringey<- sampling(epc_priors_model, iter=samples_mcmc, seed=2019, warmup=warmup_mcmc,
+                                            chains=4,
+                                            refresh = 100,
+                                            data=list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
+                                                      M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
+                                                      T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
+                                                      E_N = NEED_data_typecast$E_TOT_normal ,
+                                                      E_M = epc_df_cl$E_CONS_normal,
+                                                      sigma_N = 1,
+                                                      tn = as.numeric(NEED_data_typecast$group),
+                                                      tm = as.numeric(epc_df_cl$group)
+                                                      ),
+                                            control = list(#max_treedepth = 10,
+                                                           adapt_delta = 0.8
+                                                           )
+)
 
-# reverse_convert <- function(mu,sig){
-#   eint <- ((rnorm(1,mu,sig)*sd(NEED_data_typecast$E_TOT_sqrt))+mean(NEED_data_typecast$E_TOT_sqrt))^2
-# }
+#save(epc_priors_haringey, file="20210817_EPC_Haringey_Prior.RData")
 
-# E_posterior <- as.data.frame(lapply(colnames(as.data.frame(epc_mcmc_dist$E)), function(i){mapply(reverse_convert, mu=E_prior_mean[,i], sig=E_prior_mean$sigma)}))
-# colnames(E_posterior) <- c(1:24)
+# EXTRACT DATAFRAME FROM MODEL OUTPUTS FOR PLOTS #
 
-# require(reshape2)
+epc_mcmc_dist <- epc_priors_haringey %>% 
+  rstan::extract()  
 
-# E_posterior_plot <- melt(E_posterior)
-# colnames(E_posterior_plot) <- c("group","E_POS")
-# E_posterior_plot$group <- as.numeric(as.character(E_posterior_plot$group))
+E_prior_mean <- as.data.frame(epc_mcmc_dist$E)
+E_prior_mean$sigma <- (epc_mcmc_dist$sigma)
+
+reverse_convert <- function(mu,sig){
+  eint <- ((rnorm(1,mu,sig)*sd(NEED_data_typecast$E_TOT_sqrt))+mean(NEED_data_typecast$E_TOT_sqrt))^2
+}
+
+E_posterior <- as.data.frame(lapply(colnames(as.data.frame(epc_mcmc_dist$E)), function(i){mapply(reverse_convert, mu=E_prior_mean[,i], sig=E_prior_mean$sigma)}))
+colnames(E_posterior) <- c(1:24)
+
+require(reshape2)
+
+E_posterior_plot <- melt(E_posterior)
+colnames(E_posterior_plot) <- c("group","E_POS")
+E_posterior_plot$group <- as.numeric(as.character(E_posterior_plot$group))
 
 # group_names <- list(
 #   "1" = "Bungalow, pre-1930",
@@ -407,4 +406,6 @@ print("Worflow Finished")
 #   xlim(0,500) + 
 #   xlab("Energy Intensity kWh/m^2/year")+theme_minimal() + ggsave("/data/outputs/base_distribution.png", width = 16, height = 16, dpi = 200)
 
-# save(E_posterior, file="/data/outputs/posterior/base_dist_posterior.Rdata")
+head(E_posterior)
+print("Worflow Finished")
+save(E_posterior, file="/data/outputs/posterior/base_dist_posterior.Rdata")
