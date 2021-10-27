@@ -1,14 +1,14 @@
 # local_energy_int-model-definition.yml #
-
 kind: Model
 api_version: v1beta1
 
 metadata:
   display_name: UK Household Energy Instensity Distribution Sampler
-  name: local_energy_int
-  publisher: A P Neto-Bradley
+  name: local-energy-int
+  publisher: Andre Neto-Bradley
   summary: MCMC Sampling of Household Energy Intensity for a Local Authority using national NEED statistics and available local EPCs.
-  description: This model uses Stan to sample posterior distributions for different housing typology energy intensities. This uses a national sample survey (NEED) as a prior and pulls available EPCs for the local authority of interest to infer the distribution of energy intensities. The user can specify the local authority to sample, as well as sampling paramaters to be passed on to the Stan sampler.
+  description: > 
+    This model uses Stan to sample posterior distributions for different housing typology energy intensities. 
 
 # rest of document #
 spec:
@@ -17,7 +17,7 @@ spec:
       - name: LOCAL_AUTHORITY
         title: Local Authority ID
         description: The ID Code for the Local Authority of Interest
-        type: character
+        type: string
         default: "E09000014"
         required: true
 
@@ -30,7 +30,7 @@ spec:
         max: 10000
         required: true
 
-     - name: MCMC_CHAINS
+      - name: MCMC_CHAINS
         title: Number of MCMC Chains
         description: No. of samples for each chain of the MCMC sampling.
         type: integer
@@ -38,9 +38,26 @@ spec:
         min: 1
         max: 16
         required: true
-  
-  # outputs:
-  #   dataslots:
-  #     - name: Posterior Samples
-  #       description: Posterior samples of energy intensity for each household typology 
-  #       path: outputs/
+
+      - name: BY_AGE
+        title: Disaggregate by Age of Building
+        description: True/False toggle on whether to disagregate by age. Default is true.
+        type: boolean
+        default: true
+        required: true
+        
+      - name: AGE_BANDS
+        title: Select Age Range for Buildings
+        description: Age range of interest. 0 is all, 1 is pre 1930, 2 is 1931-1970, 3 is 1971-2001, 4 is 2001 to present
+        type: integer
+        default: 0
+        min: 0
+        max: 4
+        required: true
+        
+      - name: GAS_TOGGLE
+        title: Disaggregate by Mains Gas Flag
+        description: Toggle on whether to disaggregate by mains gas connection. Default is false.
+        type: boolean
+        default: false
+        required: true
