@@ -232,10 +232,6 @@ Therefore, the first step is to use postcode information to assign the MSOA code
 
 #### 4.1.3. Defining the location lookup
 
-Next, we will determine the tenure lookup (`tenure_lookup`) by combining the values that appear in the EPC data with the MSM categories.
-
-> check if this values are the same for your EPC data version - if necessary, update the lists bellow.
-
 Data for linking an MSOA code to a postcode is provided by the [Open Geography portal from the Office for National Statistics](https://geoportal.statistics.gov.uk/)
 
 Several versions are available. Here, data from [November 2020](https://geoportal.statistics.gov.uk/datasets/postcode-to-output-area-to-lower-layer-super-output-area-to-middle-layer-super-output-area-to-local-authority-district-november-2020-lookup-in-the-uk/about) (the same data reported in the synthetic population) will be used.
@@ -247,6 +243,10 @@ msoa_lookup = msoa_lookup.set_index('pcds', drop=True).loc[:,'msoa11cd'].to_dict
 ```
 
 ### 4.2. Tenure
+
+Next, we will determine the tenure lookup (`tenure_lookup`) by combining the values that appear in the EPC data with the MSM categories.
+
+> check if this values are the same for your EPC data version - if necessary, update the lists bellow.
 
 #### 4.2.1. Tenure in MSM data
 
