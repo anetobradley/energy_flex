@@ -712,7 +712,7 @@ epc_df.shape
 epc_df.FLOOR_AREA.value_counts().plot(kind='barh')
 ```
 
-![png](inputs/figures/output_63_1.png)
+![png](figures/output_63_1.png)
 
 #### 5.3.2. Number of rooms
 
@@ -720,7 +720,7 @@ epc_df.FLOOR_AREA.value_counts().plot(kind='barh')
 epc_df.LC4404_C_ROOMS.value_counts().plot(kind='barh')
 ```
 
-![png](inputs/figures/output_64_1.png)
+![png](figures/output_64_1.png)
 
 #### 5.3.3. Accommodation age
 
@@ -728,7 +728,7 @@ epc_df.LC4404_C_ROOMS.value_counts().plot(kind='barh')
 epc_df.ACCOM_AGE.value_counts().plot(kind='barh')
 ```
 
-![png](inputs/figures/output_65_1.png)
+![png](figures/output_65_1.png)
 
 #### 5.3.4. Tenure
 
@@ -736,7 +736,7 @@ epc_df.ACCOM_AGE.value_counts().plot(kind='barh')
 epc_df.LC4402_C_TENHUK11.value_counts().plot(kind='barh')
 ```
 
-![png](inputs/figures/output_66_1.png)
+![png](figures/output_66_1.png)
 
 #### 5.3.5. Accommodation type
 
@@ -744,4 +744,4 @@ epc_df.LC4402_C_TENHUK11.value_counts().plot(kind='barh')
 epc_df.LC4402_C_TYPACCOM.value_counts().plot(kind='barh')
 ```
 
-![png](inputs/figures/output_67_1.png)
+![png](figures/output_67_1.png)
