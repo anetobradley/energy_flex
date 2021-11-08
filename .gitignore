@@ -1,3 +1,5 @@
 .vscode/*
 01-ActivityModel/.ipynb_checkpoints
 01-ActivityModel/data/*
+02-EnergyModel/*.tar.gz
+02-EnergyModel/01_Base_Distribution/*.tar.gz

@@ -57,7 +57,7 @@ setClass("Coefficients",
 # CLASS: GEOMETRY ###############################
 setClass("Geometry",
          representation(Storeys = "numeric", #Number of storeys
-                        Heights = "matrix",#row vector - Height in m of each storey (floor)
+                        Heights = "numeric",#row vector - Height in m of each storey (floor)
                         TotalArea = "numeric",#Total floor area of dwelling in m^2
                         Volume = "numeric",#Total volume of dwelling in m^3
                         GroundArea = "numeric",#Floor area of ground floor in m^2
@@ -74,10 +74,10 @@ geometry <- function(storeys,areas,heights,perimeters){
   geometry@Heights = heights
   geometry@TotalArea = sum(areas) #Total floor area is addition of floor areas for each floor
   geometry@Volume = as.numeric(heights%*%areas)
-  geometry@GroundArea = areas[1,1]
-  geometry@GroundPerimeter = perimeters[1,1]
-  geometry@RoofArea = areas[storeys,1]
-  geometry@FacadeArea = as.numeric(heights%*%t(perimeters))
+  geometry@GroundArea = areas[1]
+  geometry@GroundPerimeter = perimeters[1]
+  geometry@RoofArea = areas[storeys]
+  geometry@FacadeArea = as.numeric(heights%*%(perimeters))
   geometry@EnvelopeArea = geometry@FacadeArea + geometry@RoofArea + geometry@GroundArea
   return(geometry)
 }
@@ -96,7 +96,7 @@ setClass("Envelope",
                         Walls = "matrix", #Area in m^2 of walls for each orientation from SW to W
                         Glazing1 = "matrix", #Area in m^2 of single glazing for each orientation from SW to W
                         Glazing2 = "matrix", #Area in m^2 of double glazing for each orientation from SW to W
-                        Doors = "matrix",
+                        Doors = "numeric",
                         #Area in m^2 of second glazing type for each orientation from SW to W
                         TotalAreas = "matrix" #Total surface area for each orientation
                         #Should be addition of all the above areas
@@ -138,9 +138,9 @@ envelope <- function(FacadeArea, DwellingPosition, Orientation, WWR, PercentageD
     Entrances = rbind(c(1,0,0,0,1,0,0,0)) # assumes front door and back doors
   }
   
-  envelope@ExternalSurfaces = circshift(envelope@ExternalSurfaces, c(0,Orientation-1))
-  envelope@InternalSurfaces = circshift(envelope@InternalSurfaces, c(0,Orientation-1))
-  Entrances = circshift(Entrances, c(0,Orientation-1))
+  envelope@ExternalSurfaces = rbind(circshift(envelope@ExternalSurfaces, c(0,Orientation-1)))
+  envelope@InternalSurfaces = rbind(circshift(envelope@InternalSurfaces, c(0,Orientation-1)))
+  Entrances = rbind(circshift(Entrances, c(0,Orientation-1)))
   
   envelope@ShadingFactors = envelope@ExternalSurfaces # shading factors assumed to be equal to external surfaces
   
@@ -186,7 +186,7 @@ constructions <- function(EW1,EW2,DA,IW,SG,DG,roof,floor,door,SD,TM,DwellingType
   #DwellingPosition = (mid-terrace,end-terrace,semi-detached; ground, mid, top floor,etc.)
   #GroundArea = dwelling footprint (m^2)
   #GroundPerimeter = ground floor perimeter (m)
-  envelope = new("Constructions")
+  constructions = new("Constructions")
   
   #see SAP 2009 for assumptions
   if(EW1 == 1 && (EW2 == 0 || EW2 == 1 || EW2 == 4)){# 1 is uninsulated single brick
@@ -463,7 +463,7 @@ setClass("Lights",
          representation(PowerIntensity = "numeric", #Installed peak lighting power intensity in W/m^2/(100lux)
                         LEL = "numeric", #Low Energy Lighting percentage
                         LCF = "numeric", #lighting control factor
-                        LELFactor = "numeric", #energy consumption of LEL as a fraction of normal lighting
+                        LELFactor = "numeric" #energy consumption of LEL as a fraction of normal lighting
          ))
 
 lights <- function(IL,PI,lel,lcf,LELfactor){
@@ -558,3 +558,4 @@ SP <- function(TH,TC,Tps){
   
   return(SP)
 }
+
