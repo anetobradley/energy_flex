@@ -17,7 +17,7 @@ Here we present the steps made to clean and organize the EPC data.
   - [4.4. Accommodation age](#44-accommodation-age)
   - [4.5. Number of rooms](#45-number-of-rooms)
   - [4.6. Total floor area](#46-total-floor-area)
-  - [4.7. Wranglig all columns](#47-wranglig-all-columns)
+  - [4.7. Wrangling all columns](#47-wrangling-all-columns)
   - [4.8. Saving wrangled EPC data into a zip file](#48-saving-wrangled-epc-data-into-a-zip-file)
 - [5. Data overview](#5-data-overview)
   - [5.1. Before wrangling](#51-before-wrangling)
@@ -588,7 +588,7 @@ floor_area_lookup = [
         ]
 ```
 
-### 4.7. Wranglig all columns
+### 4.7. Wrangling all columns
 
 ```python
 list_df = []
