@@ -1,5 +1,7 @@
 .vscode/*
-01-ActivityModel/.ipynb_checkpoints
+*.ipynb_checkpoints
 01-ActivityModel/data/*
+01-ActivityModel/phase1/EPC/data/all-domestic-certificates.zip
+01-ActivityModel/phase1/EPC/data/eps_england.zip
 02-EnergyModel/*.tar.gz
 02-EnergyModel/01_Base_Distribution/*.tar.gz
