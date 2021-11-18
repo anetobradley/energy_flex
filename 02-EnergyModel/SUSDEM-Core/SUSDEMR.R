@@ -95,68 +95,64 @@ firstfloorareas = designParam$FirstFloorArea #matrix for First floor area
 secondfloorareas = designParam$SecondFloorArea #matrix for Second floor area
 totalfloorareas = groundfloorareas+firstfloorareas+secondfloorareas #matrix for Total floor area
 
-#SPECIFY NUMBER OF CLUSTERS
-C = 5 # C = number of building classes (i.e. clusters) for housing stock analysis; Five for case study
-
 #create structure of input data
 #sort dwellings into clusters by building class (structural type and construction age)
-for(n in 1:N){
-  
-  if((dwellingposition[n] == 1 || dwellingposition[n] == 2) && (dwellingage[n] == 0 || dwellingage[n] == 1)){
-    buildingData(1).inputs = cat(1,buildingData(1).inputs,designParam(n,:));
-    buildingData(1).areas = cat(1,buildingData(1).areas,totalfloorareas(n,:));
-  }else if((dwellingposition[n] == 3) && (dwellingage[n] == 1 || dwellingage[n] == 2)){
-    buildingData(2).inputs = cat(1,buildingData(2).inputs,designParam(n,:));
-    buildingData(2).areas = cat(1,buildingData(2).areas,totalfloorareas(n,:));
-  }else if((dwellingposition(n,1) == 3) && (dwellingage(n,1) == 3)){
-    buildingData(3).inputs = cat(1,buildingData(3).inputs,designParam(n,:));
-    buildingData(3).areas = cat(1,buildingData(3).areas,totalfloorareas(n,:));
-  }else if((dwellingtype(n,1) == 1 || dwellingposition(n,1) == 3) && (dwellingage(n,1) == 3 || dwellingage(n,1) == 4 || dwellingage(n,1) == 5)){
-    buildingData(4).inputs = cat(1,buildingData(4).inputs,designParam(n,:));
-    buildingData(4).areas = cat(1,buildingData(4).areas,totalfloorareas(n,:));
-  }else if((dwellingposition(n,1) == 1 || dwellingposition(n,1) == 2) && (dwellingage(n,1) == 3 || dwellingage(n,1) == 4 || dwellingage(n,1) == 5)){
-    buildingData(5).inputs = cat(1,buildingData(5).inputs,designParam(n,:));
-    buildingData(5).areas = cat(1,buildingData(5).areas,totalfloorareas(n,:));
-  }
-  
-  }
+# for(n in 1:N){
+#   
+#   if((dwellingposition[n] == 1 || dwellingposition[n] == 2) && (dwellingage[n] == 0 || dwellingage[n] == 1)){
+#     buildingData(1).inputs = cat(1,buildingData(1).inputs,designParam(n,:));
+#     buildingData(1).areas = cat(1,buildingData(1).areas,totalfloorareas(n,:));
+#   }else if((dwellingposition[n] == 3) && (dwellingage[n] == 1 || dwellingage[n] == 2)){
+#     buildingData(2).inputs = cat(1,buildingData(2).inputs,designParam(n,:));
+#     buildingData(2).areas = cat(1,buildingData(2).areas,totalfloorareas(n,:));
+#   }else if((dwellingposition(n,1) == 3) && (dwellingage(n,1) == 3)){
+#     buildingData(3).inputs = cat(1,buildingData(3).inputs,designParam(n,:));
+#     buildingData(3).areas = cat(1,buildingData(3).areas,totalfloorareas(n,:));
+#   }else if((dwellingtype(n,1) == 1 || dwellingposition(n,1) == 3) && (dwellingage(n,1) == 3 || dwellingage(n,1) == 4 || dwellingage(n,1) == 5)){
+#     buildingData(4).inputs = cat(1,buildingData(4).inputs,designParam(n,:));
+#     buildingData(4).areas = cat(1,buildingData(4).areas,totalfloorareas(n,:));
+#   }else if((dwellingposition(n,1) == 1 || dwellingposition(n,1) == 2) && (dwellingage(n,1) == 3 || dwellingage(n,1) == 4 || dwellingage(n,1) == 5)){
+#     buildingData(5).inputs = cat(1,buildingData(5).inputs,designParam(n,:));
+#     buildingData(5).areas = cat(1,buildingData(5).areas,totalfloorareas(n,:));
+#   }
+#   
+#   }
 
+# Temporary equivalent - to be replaced with NEED typology function from Energy Intensity Estimation
+
+designParam$Cluster <- 0
+
+designParam$Cluster[which((designParam$DwellingPosition == 1 | designParam$DwellingPosition == 2) & (designParam$AgeBandCode == 0 | designParam$AgeBandCode == 1))] <- 1
+designParam$Cluster[which((designParam$DwellingPosition == 3) & (designParam$AgeBandCode == 1 | designParam$AgeBandCode == 2))] <- 2
+designParam$Cluster[which((designParam$DwellingPosition == 3) & (designParam$AgeBandCode == 3))] <- 3
+designParam$Cluster[which((designParam$DwellingType == 1 | designParam$DwellingPosition == 3) & (designParam$AgeBandCode == 3 | designParam$AgeBandCode == 4| designParam$AgeBandCode == 5))] <- 4
+designParam$Cluster[which((designParam$DwellingPosition == 1 | designParam$DwellingPosition == 2) & (designParam$AgeBandCode == 3 | designParam$AgeBandCode == 4| designParam$AgeBandCode == 5))] <- 5
 
 #clear designParam
 #clear dwellingtype
 #clear dwellingposition
 #clear dwellingage
 
+#SPECIFY NUMBER OF CLUSTERS
+C = length(unique(# C = number of building classes (i.e. clusters) for housing stock analysis; Five for case study
+
+
 #------------------------------------------------
 # LOAD POSTERIORS OF ENERGY INTENSITY
 # FROM BAYESIAN REGRESSION
 #------------------------------------------------
 # FOR GAMMA POSTERIORS
-# Results from Bayesian regression analysis with a mixture of two priors,
+# Original SUSDEM used results from Bayesian regression analysis with a mixture of two priors,
 # including errors in variables model
 # See paper: Booth, Choudhary, and Spiegelhalter (2013), "A hierarchical
 # Bayesian framework for calibrating micro-level models with macro-level
 # data", Journal of Building Performance Simulation, DOI: 10.1080/19401493.2012.723750
-
-# ORIGINAL SECTION HAS BEEN
-
-# specify burn period
-burn = 1000; # number of MCMC samples to discard
-
-S1=bugs2mat('paleopriorsnoepsilon2.ind','paleopriorsnoepsilon2a.out')
-gammaposteriors1(:,:) = S1.eint(burn:end,:) #eliminate initial samples as burn period
-
-S2=bugs2mat('paleopriorsnoepsilon2.ind','paleopriorsnoepsilon2b.out')
-gammaposteriors2(:,:) = S2.eint(burn:end,:) #eliminate initial samples as burn period
-
-S3=bugs2mat('paleopriorsnoepsilon2.ind','paleopriorsnoepsilon2c.out')
-gammaposteriors3(:,:) = S3.eint(burn:end,:) #eliminate initial samples as burn period
-
-S4=bugs2mat('paleopriorsnoepsilon2.ind','paleopriorsnoepsilon2d.out')
-gammaposteriors4(:,:) = S4.eint(burn:end,:); #eliminate initial samples as burn period
+#
+# ORIGINAL SECTION HAS BEEN REMOVED AND REPLACED WITH HIERARCHICAL MODEL FOR ESTIMATING
+# LOCAL ENERGY INTENSITY.
 
 #create large posterior sample population from joining separate posterior chains
-gammaposteriors = cat(1, gammaposteriors1,gammaposteriors2,gammaposteriors3,gammaposteriors4)
+#gammaposteriors = cat(1, gammaposteriors1,gammaposteriors2,gammaposteriors3,gammaposteriors4)
 
 #clear gammaposteriors1
 #clear gammaposteriors2
@@ -168,64 +164,68 @@ gammaposteriors = cat(1, gammaposteriors1,gammaposteriors2,gammaposteriors3,gamm
 #clear S4
 
 #store posterior distributions
-buildingData(1).posteriors = gammaposteriors(:,2) # pre-1914 terraced houses/bungalows
-buildingData(2).posteriors = gammaposteriors(:,7) # 1914-1945 semi-detached houses/bungalows
-buildingData(3).posteriors = gammaposteriors(:,11) # 1945-1964 semi-detached houses/bungalows
-buildingData(4).posteriors = gammaposteriors(:,13) # 1945-1979 flats and maisonettes
-buildingData(5).posteriors = gammaposteriors(:,14) # 1945-1979 terraced houses/bungalows
+#buildingData(1).posteriors = gammaposteriors(:,2) # pre-1914 terraced houses/bungalows
+#buildingData(2).posteriors = gammaposteriors(:,7) # 1914-1945 semi-detached houses/bungalows
+#buildingData(3).posteriors = gammaposteriors(:,11) # 1945-1964 semi-detached houses/bungalows
+#buildingData(4).posteriors = gammaposteriors(:,13) # 1945-1979 flats and maisonettes
+#buildingData(5).posteriors = gammaposteriors(:,14) # 1945-1979 terraced houses/bungalows
 
-clear gammaposteriors
+#clear gammaposteriors
 
-% specify number of samples for the Bayesian calibration
+# specify number of samples for the Bayesian calibration
 samples = 10; 
-% i.e. number of simulations and number of samples from posteriors of energy intensity
+# i.e. number of simulations and number of samples from posteriors of energy intensity
 
-%RUN ANALYSIS FOR EACH BUILDING CLASS
-%parpool(C) %run parallel analysis for each cluster
+# RUN ANALYSIS FOR EACH BUILDING CLASS
+# parpool(C) %run parallel analysis for each cluster
 for i = 1:C
 
-%-----------------------------------------------------
-  %CALCULATE INPUTS AND OUTPUTS FOR BAYESIAN CALIBRATION
-%-----------------------------------------------------
-  % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  % xf: Design points corresponding to field trials
-% xc,tc: Design points corresponding to computer trials
-% (tc is calibration parameters, xc is known parameters)
-% yf: Response from field experiments
-% yc: Response from computer simulations
+#-----------------------------------------------------
+# CALCULATE INPUTS AND OUTPUTS FOR BAYESIAN CALIBRATION
+#-----------------------------------------------------
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# xf: Design points corresponding to field trials
+# xc,tc: Design points corresponding to computer trials
+# (tc is calibration parameters, xc is known parameters)
+# yf: Response from field experiments
+# yc: Response from computer simulations
 
-[xf, yf, xc, tc, yc] = IO(samples, buildingData(i).inputs, texts, buildingData(i).posteriors, weather);
+IO_out = IO(samples, filter(designParam,Cluster==1), posteriors, salford_weather)
 
-%------------------------
-  %RUN BAYESIAN CALIBRATION
-%------------------------
-  % See paper: Booth, Choudhary, and Spiegelhalter (2013), "Handling
-% uncertainty in housing stock models", Building and Environment, DOI: 10.1016/j.buildenv.2011.08.016
+xf = IO_out[1:10]
+yf = IO_out[11:20]
+xc = IO_out[21:30]
+yc = IO_out[31:40]
+tc = IO_out[41:100]
 
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  % Return posterior realizations and params structure
-% pvals: samples from joint posterior distribution of calibration params
-% params: structure with info about parameters
-[pvals, params] = gaspdriver(yf,yc,xf,xc,tc);
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#------------------------
+# RUN BAYESIAN CALIBRATION
+#------------------------
+# See paper: Booth, Choudhary, and Spiegelhalter (2013), "Handling
+# uncertainty in housing stock models", Building and Environment, DOI: 10.1016/j.buildenv.2011.08.016
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Return posterior realizations and params structure
+# pvals: samples from joint posterior distribution of calibration params
+# params: structure with info about parameters
+stan_post = standriver(yf,yc,xf,xc,tc);
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
-  buildingData(i).pvals = pvals;
-buildingData(i).params = params;
+buildingData(i).pvals = pvals
+buildingData(i).params = params
 
-%---------------------------------------------
-  % RUN RETROFIT ANALYSIS USING CALIBRATED MODEL
-%---------------------------------------------
-  % See paper: Booth and Choudhary (2013), "Decision making under uncertainty
-% in the retrofit analysis of the UK housing stock: Implications for the
-% Green Deal", Energy and Buildings, DOI: 10.1016/j.enbuild.2013.05.014
+#---------------------------------------------
+# RUN RETROFIT ANALYSIS USING CALIBRATED MODEL
+#---------------------------------------------
+# See paper: Booth and Choudhary (2013), "Decision making under uncertainty
+# in the retrofit analysis of the UK housing stock: Implications for the
+# Green Deal", Energy and Buildings, DOI: 10.1016/j.enbuild.2013.05.014
 
-[Demand, Utility] = retrofitAnalysis(pvals, params, samples, buildingData(i).inputs, texts, weather);
+#[Demand, Utility] = retrofitAnalysis(pvals, params, samples, buildingData(i).inputs, texts, weather);
 
-buildingData(i).Demand = Demand; %End-use energy demands
-buildingData(i).Utility = Utility; %Utilities (installation costs; lifetime financial savings; CO2 emissions
-                                               %savings; thermal comfort improvement)
+#buildingData(i).Demand = Demand #End-use energy demands
+#buildingData(i).Utility = Utility #Utilities (installation costs; lifetime financial savings; CO2 emissions
+                                               #savings; thermal comfort improvement)
 
-end
-
-matlabpool close
 
