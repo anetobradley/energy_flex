@@ -1,5 +1,4 @@
-
-of Household Reference Person (HRP)
+# Variables description for `msm_england_epc` synthetic population
 
 ## Accommodation type
 
