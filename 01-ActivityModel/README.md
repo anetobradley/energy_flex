@@ -23,27 +23,27 @@
     <p style="font-size:0.75em;"> Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></p>
 </div>
 
-### Phase 1
+### Step 1
 
-> In **Phase 1** all necessary data is identified, collected, cleaned and organized.
+> In **Step 1** all necessary data is identified, collected, cleaned and organized.
 
-In principle, the necessary information are:
+The necessary information are:
 
-* Geographic information
-* Socio-economic information
-* Household information
-* Accommodation information
-* Time use information
+- SPENSER synthetic population
+- Geographic lookup
+- Accommodation information
+- Time use information
 
-### Phase 2
+### Step 2
 
-> In **Phase 2** the data is used to model a synthetic representation of all individuals in a study area. 
+> In **Step 2** the data is used to model a synthetic representation of all individuals in a study area.
 
-* The model will be built on the SPENSER (a spatial MSM for Great Britain) framework. 
-* The synthetic individuals will be imbued with socio-demographic characteristics and, importantly, information about how they spend their time during a ‘normal’ day.
+- The model will be built on the SPENSER (a spatial MSM for Great Britain) synthetic population.
+- The synthetic individuals will be imbued with socio-demographic characteristics.
+- The synthetic individuals will be connect with households.
 
-### Phase 3
+### Step 3
 
-> In **Phase 3** the synthetic population will be connect with households.
+> In **Step 3** the Dynamic Activity Model for Energy is created.
 
-* This model will enable us to test hypotheses about variations in energy demand and their relationship with household composition and their socio-economic-demographic features.
+* The synthetic individuals will be imbued with information about how they spend their time during a ‘normal’ day.
