@@ -86,13 +86,13 @@ indexEPC = choices(indices[i], weights=W)[0]
 where <img src="https://render.githubusercontent.com/render/math?math=W"> is the weight array defined by
 
 <p align="center">
-<img src="https://render.githubusercontent.com/render/math?math=W(%5CDelta%20P_%7Bi%2Cj%7D)%20%3D%20N%20-%20%20%5Cdfrac%7B%5CDelta%20P_%7Bi%2Cj%7D%7D%7B%5CDelta%20P_%7Bi%2Cn%7D%7D(N-M)%2C">
+<img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20W(%5CDelta%20P_%7Bi%2Cj%7D)%20%3D%20N%20-%20%20%5Cdfrac%7B%5CDelta%20P_%7Bi%2Cj%7D%7D%7B%5CDelta%20P_%7Bi%2Cn%7D%7D(N-M)%2C">
 </p>
 
 where:
 
 - <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20%5CDelta%20P_%7Bi%2Cj%7D">: Propensity Score difference between the MSM household <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20i"> and the EPC neighbour <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20j">, with <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%201%20%5Cle%20j%20%5Cle%20n">.
 - <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20%5CDelta%20P_%7Bi%2Cn%7D">: Propensity Score difference between the MSM household <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20i"> and the EPC neighbor <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20n">.
-- $n$: The number of neighbors (n_neighbors).
+- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20n">: The number of neighbors (n_neighbors).
 - <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20N">: Value of the highest desired weight. Here <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20N%3D100">.
 - <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20M">: Value of the lowest desired weight. Here <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20M%3D5">.
