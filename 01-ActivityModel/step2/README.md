@@ -1,5 +1,7 @@
 # Enriched Synthetic Population <!-- omit in toc -->
 
+An example for the EPC/SPENSER PSM (Haringey LAD) code can be found [here](EPC_propensity_score_matching.ipynb).
+
 ## Propensity Score Matching
 
 In order to enrich the baseline synthetic population the Propensity Score Matching (PSM) method was used. Through the PSM method each baseline individual is matched, based  on the similarity of their characteristics, to an individual in an external dataset.
@@ -22,8 +24,6 @@ In order to enrich the baseline synthetic population the Propensity Score Matchi
 
 Energy Performance Certificate (EPC) dataset provides energy performance related data about domestic accommodations.
 
-The complete EPC/SPENSER PSM code can be found [here](EPC_propensity_score_matching.ipynb).
-
 ### Variable selection - Steps 1, 2, 3 and 4
 
 - Treatment values:
@@ -34,7 +34,6 @@ The complete EPC/SPENSER PSM code can be found [here](EPC_propensity_score_match
   - Area
   - Tenure
   - Accommodation type
-  - Number of rooms (not used)
 
 - EPC/SPENSER non-matching variables:
   - Floor area
@@ -57,7 +56,7 @@ PropensityScore = model.propensity['fitted']
 
 > Important: the `CausalModel` only work with numerical arrays.
 
-### Matching Process
+### Matching Process - Step 6
 
 First, for each baseline individual (SPENSER) a list with `n` closest EPC individuals was created. The [`sklearn.neighbors`](https://scikit-learn.org/stable/modules/neighbors.html) is helpful for this task:
 
@@ -91,8 +90,33 @@ where <img src="https://render.githubusercontent.com/render/math?math=W"> is the
 
 where:
 
-- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20%5CDelta%20P_%7Bi%2Cj%7D">: Propensity Score difference between the MSM household <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20i"> and the EPC neighbour <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20j">, with <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%201%20%5Cle%20j%20%5Cle%20n">.
-- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20%5CDelta%20P_%7Bi%2Cn%7D">: Propensity Score difference between the MSM household <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20i"> and the EPC neighbor <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20n">.
-- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20n">: The number of neighbors (n_neighbors).
+- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20%5CDelta%20P_%7Bi%2Cj%7D">: Propensity Score difference between the baseline individual <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20i"> and the external neighbour <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20j">, with <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%201%20%5Cle%20j%20%5Cle%20n">.
+- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20%5CDelta%20P_%7Bi%2Cn%7D">: Propensity Score difference between the baseline individual household <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20i"> and the external neighbour <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20n">.
+- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20n">: The number of listed neighbors.
 - <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20N">: Value of the highest desired weight. Here <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20N%3D100">.
 - <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20M">: Value of the lowest desired weight. Here <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20M%3D5">.
+
+The function above is a step like function where the distance between the steps is related with the PS difference between two individuals. The greater the PS difference, the greater the distance between the steps. Finally, equal Propensity Score differences receive the same weight.
+
+> The weight used by the `random.choices` function does not need to be normalized!
+
+## Enriched Synthetic Population Evaluation - Step 7
+
+After find a match for each baseline individual, an internal validation is applied to the non-matching variables (used to enrich the baseline population).
+
+As can be seen below, the variables distribution for the external dataset and the enriched synthetic population are consistent. This is an indication that the synthetic population represents the real population.
+
+### Floor Area
+<!--
+| Floor Area (A) | A <= 40 m² | 40 < A <= 50 m² | 50 < A <= 60 m² | 60 < A <= 70 m² | 70 < A <= 80 m² | 80 < A <= 90 m² | 90 < A <= 100 m² | 100 < A <= 110 m² | 110 < A <= 120 m² | 120 < A <= 130 m² | 130 < A <= 140 m² | 140 < A <= 150 m² | 150 < A <= 200 m² | 200 < A <= 300 | A > 300 |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Code | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+| EPC | 14.0% | 14.0% | 15.6% | 13.6% | 12.5% | 8.3% | 5.5% | 4.0% | 3.1% | 2.2% | 1.6% | 1.1% | 2.9% | 1.3% | 0.4% |
+| SPENSER | 12.1% | 12.5% | 13.5% | 12.0% | 11.1% | 8.6% | 5.8% | 4.9% | 4.0% | 2.8% | 3.2% | 1.6% | 4.7% | 2.5% | 1.0% |
+-->
+
+![Floor Area Validation](figures/validation1.png)
+
+### Accommodation Age
+
+![Accommodation Validation](figures/validation2.png)
