@@ -2,11 +2,11 @@
 
 ## Propensity Score Matching
 
-In order to enrich the baseline synthetic population (SPENSER) the Propensity Score Matching (PSM) method was used. Through the PSM method each SPENSER individual was matched, based  on the similarity of their characteristics, to an individual in an external dataset.
+In order to enrich the baseline synthetic population the Propensity Score Matching (PSM) method was used. Through the PSM method each baseline individual is matched, based  on the similarity of their characteristics, to an individual in an external dataset.
 
 ### General approach
 
-1. Merge the baseline and the external datasets.
+1. Concatenate the baseline and the external datasets.
 2. Assign a treatment indicator (0 or 1) for each individual:
    - Baseline individual: Treatment = 0
    - External individual: Treatment = 1
