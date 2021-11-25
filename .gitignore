@@ -3,5 +3,6 @@
 01-ActivityModel/data/*
 *all-domestic-certificates.zip
 *epc_england.zip
+*msm_england.zip
 02-EnergyModel/*.tar.gz
 02-EnergyModel/01_Base_Distribution/*.tar.gz
