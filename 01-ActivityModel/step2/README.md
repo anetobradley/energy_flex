@@ -75,7 +75,7 @@ Then, for each baseline individual, select an external individual from the neigh
 
 - Individuals with closer PS are more likely to be selected.
 
-The following code illustrates how to obtain the match for the individual $i$:
+The following code illustrates how to obtain the match for the individual <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20i">:
 
 ```python
 from random import choices
