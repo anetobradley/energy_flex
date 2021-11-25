@@ -91,8 +91,8 @@ where <img src="https://render.githubusercontent.com/render/math?math=W"> is the
 
 where:
 
-- $\Delta P_{i,j}$: Propensity Score difference between the MSM household $i$ and the EPC neighbor $j$ ($1 \le j \le n$)
-- $\Delta P_{i,n}$: Propensity Score difference between the MSM household $i$ and the EPC neighbor $n$
+- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20%5CDelta%20P_%7Bi%2Cj%7D">: Propensity Score difference between the MSM household <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20i"> and the EPC neighbour <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20j">, with <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%201%20%5Cle%20j%20%5Cle%20n">.
+- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20%5CDelta%20P_%7Bi%2Cn%7D">: Propensity Score difference between the MSM household <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20i"> and the EPC neighbor <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20n">.
 - $n$: The number of neighbors (n_neighbors).
-- N: Value of the highest desired weight. Here $N=100$.
-- M: Value of the lowest desired weight. Here $M=5$.
+- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20N">: Value of the highest desired weight. Here <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20N%3D100">.
+- <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20M">: Value of the lowest desired weight. Here <img src="https://render.githubusercontent.com/render/math?math=%5Clarge%20M%3D5">.
