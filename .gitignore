@@ -2,6 +2,6 @@
 *.ipynb_checkpoints
 01-ActivityModel/data/*
 *all-domestic-certificates.zip
-*eps_england.zip
+*epc_england.zip
 02-EnergyModel/*.tar.gz
 02-EnergyModel/01_Base_Distribution/*.tar.gz
