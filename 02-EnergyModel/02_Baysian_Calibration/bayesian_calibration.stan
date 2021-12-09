@@ -1,3 +1,8 @@
+// Based on Adrian Chong's adaptation of  Kennedy and O'Hagan Model for 
+// Combining Field Data and Computer Simulations for Calibration and Prediction.
+//
+// https://github.com/adChong/bc-stan
+
 data {
   int<lower=0> n; // number of field data
   int<lower=0> m; // number of computer simulation
@@ -98,15 +103,14 @@ model {
   for (i in 1:n) {
     sigma_z[i, i] = sigma_z[i, i] + (1.0 / lambda_e);
   }  
-
   // Specify priors here
-  rho_eta[1:(p+q)] ~ beta(1.0, 0.3);
-  rho_delta[1:p] ~ beta(1.0, 0.3);
-  lambda_eta ~ gamma(10, 10); // gamma (shape, rate)
-  lambda_delta ~ gamma(10, 0.3); 
-  lambda_e ~ gamma(10, 0.03); 
+  //tf[q] ~ uniform(0,1);
+  rho_eta[1:(p+q)] ~ beta(1.0, 0.5);
+  rho_delta[1:p] ~ beta(1.0, 0.2);
+  lambda_eta ~ gamma(10, 1); // gamma (shape, rate)
+  lambda_delta ~ gamma(10, 1); 
+  lambda_e ~ gamma(10, 0.1); 
 
-  L = cholesky_decompose(sigma_z); // cholesky decomposition
+  L = cholesky_decompose(sigma_z); // cholesky decomposition 
   z ~ multi_normal_cholesky(mu, L);
 }
-

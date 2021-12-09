@@ -124,9 +124,10 @@ designParam$Cluster <- 0
 
 designParam$Cluster[which((designParam$DwellingPosition == 1 | designParam$DwellingPosition == 2) & (designParam$AgeBandCode == 0 | designParam$AgeBandCode == 1))] <- 1
 designParam$Cluster[which((designParam$DwellingPosition == 3) & (designParam$AgeBandCode == 1 | designParam$AgeBandCode == 2))] <- 2
-designParam$Cluster[which((designParam$DwellingPosition == 3) & (designParam$AgeBandCode == 3))] <- 3
 designParam$Cluster[which((designParam$DwellingType == 1 | designParam$DwellingPosition == 3) & (designParam$AgeBandCode == 3 | designParam$AgeBandCode == 4| designParam$AgeBandCode == 5))] <- 4
 designParam$Cluster[which((designParam$DwellingPosition == 1 | designParam$DwellingPosition == 2) & (designParam$AgeBandCode == 3 | designParam$AgeBandCode == 4| designParam$AgeBandCode == 5))] <- 5
+designParam$Cluster[which((designParam$DwellingPosition == 3) & (designParam$AgeBandCode == 3))] <- 3
+
 
 #clear designParam
 #clear dwellingtype
@@ -134,7 +135,7 @@ designParam$Cluster[which((designParam$DwellingPosition == 1 | designParam$Dwell
 #clear dwellingage
 
 #SPECIFY NUMBER OF CLUSTERS
-C = length(unique(# C = number of building classes (i.e. clusters) for housing stock analysis; Five for case study
+C = length(unique())# C = number of building classes (i.e. clusters) for housing stock analysis; Five for case study
 
 
 #------------------------------------------------
@@ -173,7 +174,7 @@ C = length(unique(# C = number of building classes (i.e. clusters) for housing s
 #clear gammaposteriors
 
 # specify number of samples for the Bayesian calibration
-samples = 10; 
+samples = 100; 
 # i.e. number of simulations and number of samples from posteriors of energy intensity
 
 # RUN ANALYSIS FOR EACH BUILDING CLASS
@@ -190,14 +191,25 @@ for i = 1:C
 # yf: Response from field experiments
 # yc: Response from computer simulations
 
-IO_out = IO(samples, filter(designParam,Cluster==1), posteriors, salford_weather)
+IO_out = IO(samples, filter(designParam,Cluster==5), gammapost, salford_weather)
 
-xf = IO_out[1:10]
-yf = IO_out[11:20]
-xc = IO_out[21:30]
-yc = IO_out[31:40]
-tc = IO_out[41:100]
+xf = as.data.frame(IO_out[1:(samples)])
+yf = as.data.frame(IO_out[(1+samples):(2*(samples))])
+xc = as.data.frame(IO_out[(1+(2*samples)):(3*(samples))])
+yc = as.data.frame(IO_out[(1+(3*samples)):(4*(samples))])
+tc= data.frame(IO_out[(1+(4*samples)):(5*(samples))],
+                IO_out[(1+(5*samples)):(6*(samples))],
+                IO_out[(1+(6*samples)):(7*(samples))],
+                IO_out[(1+(7*samples)):(8*(samples))],
+                IO_out[(1+(8*samples)):(9*(samples))],
+                IO_out[(1+(9*samples)):(10*(samples))]
+  )
+#ALT xc and xf
 
+xc$`IO_out[(1 + (2 * samples)):(3 * (samples))]` <- rnorm(100,1,1)
+xf$`IO_out[1:(samples)]`<-rnorm(100,1,1)
+xf <- data.frame(xf[sample(nrow(xf),10),])
+yf <- data.frame(yf[sample(nrow(yf),10),])
 
 #------------------------
 # RUN BAYESIAN CALIBRATION
@@ -209,9 +221,16 @@ tc = IO_out[41:100]
 # Return posterior realizations and params structure
 # pvals: samples from joint posterior distribution of calibration params
 # params: structure with info about parameters
-stan_post = standriver(yf,yc,xf,xc,tc);
+stan_post_c5_NO_PRED1.0= standriver(yf,yc,xf,xc,tc);
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
+
+eta_mu <- mean(yc[,1], na.rm = TRUE) # mean value
+eta_sd <- sd(yc[,1], na.rm = TRUE) # standard deviation
+
+
+y_pred <- fitsamples$y_pred * eta_sd + eta_mu 
+
+
 buildingData(i).pvals = pvals
 buildingData(i).params = params
 
