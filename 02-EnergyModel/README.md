@@ -22,7 +22,7 @@ The data is grouped according to the age band and property type. The NEED data i
 
 An example of the sampled posteriors is shown below for the London Borough of Haringey, with the prior distribution and the distribution of available EPCs shown for comparison.
 
-![image](https://user-images.githubusercontent.com/66263560/130320020-e4f37ee9-db1a-40e8-a7b4-9a97068bec3e.png width=6cm)
+![image](https://user-images.githubusercontent.com/66263560/130320020-e4f37ee9-db1a-40e8-a7b4-9a97068bec3e.png)
 
 ### Step 2: Calibration
 
