@@ -1,27 +1,28 @@
 # Energy Intensity Estimation:  <!-- omit in toc -->
 
-Here we present the steps made to clean and organize the EPC data.
+Here we present the steps taken to infer a posterior energy intensity distribution by household typology, using NEED and EPC data.
 
-> You can run this wrangling process using the [notebook version](EPC_data_wrangling.ipynb).
-
-- [1. Data Sources](#1-epc-data)
-- [2. Data Engineering Overview](#2-wrangling-process-description)
-- [3. Initialisation](#3-initialisation)
+- [1. Data Sources](#1-data-sources)
+- [2. Data Engineering Overview](#2-data-engineering-overview)
+- [3. Categorising Household Typologies](#3-categorising-household-typologies)
   - [3.1. Import necessary modules](#31-import-necessary-modules)
   - [3.2. Defining necessary parameters](#32-defining-necessary-parameters)
   - [3.3. Defining necessary functions](#33-defining-necessary-functions)
+- [4. Bayesian Hierarchical Model](#4-bayesian-hierarchical-model)
+- [5. MCMC Sampling using Stan](#5-mcmc-sampling-using-stan)
+- [6. Notes on Data & Outputs](#6-notes-on-data-&-outputs)
 
 ## 1. Data Sources
 
-> The data used for this is automatically loaded from online sources (URL and API). The only user input for this sampler is the Local Authority.
+> The data used for this is automatically loaded from online sources (URL and API). The only user input for this sampler is the Local Authority and a boolean variable which sets the typology labelling to either be age agnostic (`FALSE`) or not (`TRUE`).
 
 Data on the energy performance of buildings in England and Wales can be obtained from the Energy Performance Certificate (EPC) provided [here](https://epc.opendatacommunities.org/) (you will need to register to access the data).
 
-For this work, we downloaded all available files (button `All results (.zip)`).
+For this work, we load the 5000 most recent EPCs from the Local Authority of Interest.
 
-- EPCs issued from January 2008 up to and including 30 June 2021.
+- This can include any EPCs issued from January 2008.
 
-In addition this model also uses the National Energy Effiency Data
+In addition this model also uses the household level instances from the the National Energy Effiency Data (NEED). This is only not disaggregated by Local Authority.
 
 ## 2. Data Engineering Overview
 
@@ -29,19 +30,28 @@ In addition this model also uses the National Energy Effiency Data
 
 To wrangling the EPC data, the following steps were applied for each column:
 
-1. Load NEED dataset and standardise age band numbering;
+1. Load NEED dataset;
 2. Assign typology labels to individual households in NEED dataset;
-3. Assign a code to each EPC value following the MSM description (or the desired code/value table);
-    - If the row has no value (or has a value with no match), the value -1 will be used;
-4. Create a lookup dictionary;
-5. Go through the entire table updating values based on the lookup dictionary;
-6. Save the updated table;
+3. Convert NEED energy consumption to energy intensity using floor area categories;
+4. Access EPCs for Local Authority of interest using API;
+5. 
+6. Go through the entire table updating values based on the lookup dictionary;
+7. Pass the processed NEED and EPC dataframes to RStan.
 
 ## 3. Categorising Household Typologies
 
 > A feature of this model is that it accounts for heterogeneity across typologies of household (e.g. 2000s Flat vs. 1930s Semi-dettached house). To do this requires categorising 
 
-### 3.1. Standardise the 
+### 3.1. Standardise the Age Bands
+
+The age banding across the NEED and EPC datasets needs to be homogenised before categorising typologies.
+
+| Years | NEED Age Band|
+| ------------- |-------------|
+| before 1930 | 101 |
+| 1930-1972 | 102 |
+| 1973-1999 | 103 |
+| 2000 or later | 104 |
 
 ### 3.2 Typology Parser Function
 
@@ -125,3 +135,52 @@ typology_parser <- function(x,y){
     }
 ```
 
+## 4. Bayesian Hierarchical Model
+
+### 4.1 Model Specification
+
+```stan
+transformed parameters {
+  
+  vector[N] Eta;
+  vector[T] E;
+  
+  E = mu_E + sigma_E*yet;
+  
+  Eta = mu_E[tn] + sigma_E*zee;
+  
+
+}
+
+// The model to be estimated. We model the output
+// 'y' to be normally distributed with mean 'mu'
+// and standard deviation 'sigma'.
+model {
+  
+  zee~std_normal();
+  
+  E_N ~ normal(Eta[tn], sigma_N);
+
+  
+  yet~std_normal();
+  
+  sigma~std_normal();
+  
+  E_M ~ normal(E[tm], sigma);
+  
+}
+```
+
+### 4.2 Model Inputs
+
+### 4.3 Model Parameters
+
+## 5. MCMC Sampling using Stan
+
+### 5.1 Stan Settings
+
+### 5.2. Troubleshooting
+
+The Stan documentation provides some excellent discussion and examples concerning common errors and warning messages, however there are a few specific issues encountered when using this. 
+
+## 6. Notes on Data & Outputs
