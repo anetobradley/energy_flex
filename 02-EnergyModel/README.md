@@ -13,7 +13,7 @@ The model estimates energy use charactersitics and scenarios for the synthetic p
 The main objectives of this model are to estimate energy intensity and building parameters of interest, thus enabling an evaluation of retrofit opportunities and their effectiveness and affordability as well as flexibilty in demand.
 
 ## Modelling Steps
-
+![Energy_Model_Overview](https://user-images.githubusercontent.com/66263560/148383679-20ee1d32-b963-4cbe-9a19-19bc74f36537.png)
 ### Step 1: Estimate Energy Intensity Distributions
 
 The first step of this model involves combining national data with EPCs from local authorities to estimate a distribution for energy intensity.
@@ -21,8 +21,6 @@ The first step of this model involves combining national data with EPCs from loc
 The data is grouped according to the age band and property type. The NEED data is used to estimate a prior for the mean energy intensity of each group, and the EPCs for the local authority of interest are used alongside this prior to infer a posterior distribution for energy intensity.
 
 An example of the sampled posteriors is shown below for the London Borough of Haringey, with the prior distribution and the distribution of available EPCs shown for comparison.
-
-![image](https://user-images.githubusercontent.com/66263560/130320020-e4f37ee9-db1a-40e8-a7b4-9a97068bec3e.png)
 
 ### Step 2: Calibration
 
