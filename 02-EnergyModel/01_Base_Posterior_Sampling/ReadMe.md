@@ -1,13 +1,12 @@
-# Energy Intensity Estimation:  <!-- omit in toc -->
+# Energy Intensity Estimation  <!-- omit in toc -->
 
 Here we present the steps taken to infer a posterior energy intensity distribution by household typology, using NEED and EPC data.
 
 - [1. Data Sources](#1-data-sources)
 - [2. Data Engineering Overview](#2-data-engineering-overview)
 - [3. Categorising Household Typologies](#3-categorising-household-typologies)
-  - [3.1. Import necessary modules](#31-import-necessary-modules)
+  - [3.1. Standardise the Age Bands](#31-import-necessary-modules)
   - [3.2. Defining necessary parameters](#32-defining-necessary-parameters)
-  - [3.3. Defining necessary functions](#33-defining-necessary-functions)
 - [4. Bayesian Hierarchical Model](#4-bayesian-hierarchical-model)
 - [5. MCMC Sampling using Stan](#5-mcmc-sampling-using-stan)
 - [6. Notes on Data & Outputs](#6-notes-on-data-&-outputs)
@@ -34,13 +33,13 @@ To wrangling the EPC data, the following steps were applied for each column:
 2. Assign typology labels to individual households in NEED dataset;
 3. Convert NEED energy consumption to energy intensity using floor area categories;
 4. Access EPCs for Local Authority of interest using API;
-5. 
-6. Go through the entire table updating values based on the lookup dictionary;
+5. Assign NEED Age Banding to EPC instances;
+6. Assign typology labels to individual households in EPC data;
 7. Pass the processed NEED and EPC dataframes to RStan.
 
 ## 3. Categorising Household Typologies
 
-> A feature of this model is that it accounts for heterogeneity across typologies of household (e.g. 2000s Flat vs. 1930s Semi-dettached house). To do this requires categorising 
+> A feature of this model is that it accounts for heterogeneity across typologies of household (e.g. 2000s Flat vs. 1930s Semi-dettached house). To do this requires categorising instances in the EPC and NEED data according to the house type and age.
 
 ### 3.1. Standardise the Age Bands
 
@@ -55,7 +54,7 @@ The age banding across the NEED and EPC datasets needs to be homogenised before 
 
 ### 3.2 Typology Parser Function
 
-This function 
+This function is used to assign each instance to one of 24 age-building type typologies of household. There are 6 defined house typologies in the NEED and EPCs (Bungalow, Detatched, End terrace, Mid terrace, Semi detached, Flat), and for each house type four typologies are defined, one for each age band.
 
 ```r
 typology_parser <- function(x,y){
@@ -89,7 +88,12 @@ typology_parser <- function(x,y){
 
 ## 4. Bayesian Hierarchical Model
 
+The Energy Intensity Distribution for the Local Authority of Interest is specified as a normal distribution with a mean `E` varying by household typology `t`. National level NEED data provides a prior on hyperparameters, and EPCs for teh local authority are used to infer the local distribution of energy intensity for each typology.
+
+The model is writen in Stan and the different blocks of the model file are explained below.
+
 ### 4.1 Model Inputs
+The inputs for the energy intensity model include the NEED Data which is used as a prior, and the sample of EPCs for the local authority. Model inputs are standardised and unitised.
 
 ```stan
 data {
@@ -107,6 +111,11 @@ data {
 ```
 
 ### 4.2 Model Parameters
+These are the parameters which we are looking to infer, namely the energy intensity mean for the local area and the variance. We employ a non-centered paramaterisation to improve sampling efficiency as described in the Stan User Guide (https://mc-stan.org/docs/2_19/stan-users-guide/reparameterization-section.html).
+
+In summary we say that the distribution for Local Energy Intensity Mean `E ~ N(mu_E,sigma_E)` can be represented as `E = mu_E + sigma_E*yet` where `mu_E` is a location parameter, sigma_E is a scale parameter, and zee is a standard normal distribution (`N(0,1)`). This reprarameterisation will allow for more efficient sampling in cases with little data as explained by Betancourt and Girolami (2013).
+
+In addition we also set a prior on the scale and location hyperparameters using the national level NEED data, (the `Eta` transformed parameter). This assumes that the Local Authority Energy Intensity Distribution comes from the National Energy Intensity Distribution for each typology.
 
 ```stan
 parameters {
@@ -124,7 +133,7 @@ transformed parameters {
   vector[N] Eta;
   vector[T] E;
   
-  E = mu_E + sigma_E*yet; // Reparameterisation for Posterior Mean
+  E = mu_E + sigma_E*yet; // Reparameterisation for Local Energy Intensity Mean
   
   Eta = mu_E[tn] + sigma_E*zee; // Reparameterisation for NEED Data Prior
   
@@ -133,6 +142,9 @@ transformed parameters {
 ```
 
 ### 4.3 Model Specification
+The model block defines the distribution of NEED energy intensity values `E_N`, as having a mean `Eta[tn]`, and a known precision `sigma_N` (we use a known precision term as we assume that our random sample of 50,000 households can be taken as representative of the whole population). As `E_N` and `sigma_N` are known this estimates priors for `mu_E` and `sigma_E` from the NEED data.
+
+The energy intensity for the local authority `E` is infered for each house typology `tm` from the EPC energy intensities `E_M`.
 
 ```stan
 model {
@@ -154,8 +166,31 @@ model {
 
 ### 5.1 Stan Settings
 
+We recommend following RStan recommended settings:
+
+```r
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+```
+
+In addition the following Stan mcmc sampling settings used are:
+
+```r
+iter=4000, 
+warmup=1000,
+chains=4,
+control = list(max_treedepth = 10,adapt_delta = 0.8)
+```
+
 ### 5.2. Troubleshooting
 
 The Stan documentation provides some excellent discussion and examples concerning common errors and warning messages, however there are a few specific issues encountered when using this. 
 
+1. In some local authorities there are virtually no instances of a particular typology in the EPCs. This can lead to unreliable outputs or convergence problems. An inspection of outputs should reveal this - depending on the case it may be appropriate to disregard the distribution for the typology in question (e.g. post-2000 Bungalows in Westminster) as it will not be represented in the synthetic population.
+2. Similarly the EPCs can have some erroenous data entries (for example energy intensities of tens of thousands of kWh/m2) - This too can lead to convergence problems if the sample size for a particular typology is small. In these instances it can helpful to filter out unreasonably high values (often the result of an error in inputing the EPC record in the first place).
+
 ## 6. Notes on Data & Outputs
+
+The plot below shows en example of the outputs from the MCMC sampling, with EPC and NEED prios shown alongside the posterior.
+
+![image](https://user-images.githubusercontent.com/66263560/130320020-e4f37ee9-db1a-40e8-a7b4-9a97068bec3e.png)
