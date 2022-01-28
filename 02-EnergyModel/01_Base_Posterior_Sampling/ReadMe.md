@@ -194,3 +194,7 @@ The Stan documentation provides some excellent discussion and examples concernin
 The plot below shows en example of the outputs from the MCMC sampling, with EPC and NEED prios shown alongside the posterior.
 
 ![image](https://user-images.githubusercontent.com/66263560/130320020-e4f37ee9-db1a-40e8-a7b4-9a97068bec3e.png)
+
+## 7. Allocating Energy Intensity to Synthetic Population
+
+The script `Energy_Intensity_Allocator.R` categorises the synthetic households by their typology and randomly samples the posterior distribution for that typology to stochastically allocate an energy intensity to the household.
