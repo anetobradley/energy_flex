@@ -1,0 +1,76 @@
+Free school meals: Autumn term
+2020/21 Autumn Term
+
+Description
+
+This guidance describes the data included in the Free school meals: Autumn term ad hoc statistics release. The release methodology, available on the release web page should be referenced alongside this data. It provides information on the data source, coverage and quality as well as explaining methodology used in producing the data.
+
+Coverage
+
+This release provides information on the number of schools and pupils in:
+
+- state-funded nursery schools
+- state-funded primary schools
+- state-funded secondary schools
+- special schools, including state-funded special schools and non-maintained special schools
+- pupil referral units, including free school alternative provision and academy alternative provision
+
+The information is based on data collected via the pupil level autumn school census.
+
+File formats and conventions
+
+Rounding
+
+This dataset has not had suppression applied.
+
+Conventions
+
+The following convention is used throughout the underlying data.
+
+‘:’ Not applicable.
+
+Data files
+
+Free school meals - number of FSM eligible pupils - Spring 2016 to Spring 2020 plus Autumn 2020
+
+Filename: fsm_time_series.csv
+Geographic levels: National; Local Authority; Regional
+Time period: 2015/16 Spring Term to 2020/21 Autumn Term
+Content summary: Number of pupils in state-funded nursery, primary, secondary, special schools and pupil referral units by free school meal eligibility, from Spring 2015/16 to Autumn 2020/21
+
+Variable names and descriptions for this file are provided below:
+
+Variable name         |  Variable description
+--------------------  |  -------------------------------------
+fsm_eligible          |  Number of FSM eligible pupils
+fsm_eligible_percent  |  Percentage of pupils eligible for FSM
+headcount             |  Headcount (all pupils)
+phase                 |  School type - Filter by school type
+
+Footnotes:
+
+1. Data for Autumn 2020/21 combines State-funded special school and Non-maintained special schools under a single heading of Special school. For previous years these are presented separately.
+
+
+Free school meals - number of FSM eligible pupils and new eligibility from 23rd March
+
+Filename: fsm_new_starts_autumn20.csv
+Geographic levels: National; Local Authority; Regional
+Time period: 2019/20 Autumn Term to 2020/21 Autumn Term
+Content summary: Number of pupils in state-funded nursery, primary, secondary, special schools and pupil referral units by free school meal eligibility. Also includes number of pupils who have become eligible for free school meals since March 23rd, up to census day (October 1st 2020).
+
+Variable names and descriptions for this file are provided below:
+
+Variable name         |  Variable description
+--------------------  |  -------------------------------------
+fsm_eligible          |  Number of FSM eligible pupils
+fsm_eligible_percent  |  Percentage of pupils eligible for FSM
+headcount             |  Headcount (all pupils)
+new_fsm_eligible      |  Eligible since March 23rd
+phase                 |  School type - Filter by school type
+
+Footnotes:
+
+1. Includes all pupils who are eligible for free school meals at census day (October 1st 2020, October 3rd 2019) and have become eligible since 23rd March of that year. This includes pupils who may have been eligible for free school meals previously but their latest spell has started since this date. This also includes pupils who have joined the reception class, who would not otherwise have been eligible for free school meals prior to the start of the new school year.
+2. Includes all state-funded special schools, plus non-maintained special schools
+3. Children may be eligible for free school meals in nursery if in a nursery class or nursery school and attending for full days 
