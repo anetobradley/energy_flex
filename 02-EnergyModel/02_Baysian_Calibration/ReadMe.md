@@ -116,4 +116,6 @@ return(c(MonthlyHeatingUsage, MonthlyDHWUsage, MonthlyElectricityDemand))
 
 SUSDEM uses the bayeian calibration approach outlined by Kennedy and O'Hagan (2004). This was implemented using Stan by Chong & Menberg (2019), and we have adapted their Stan model for use here.
 
+This will be updated to work with CmdStan for better parallel processing capabilities compared to RStan.
+
 ## 7. Notes on Outputs & Data
