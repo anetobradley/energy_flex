@@ -8,3 +8,4 @@
 02-EnergyModel/01_Base_Distribution/*.tar.gz
 02-EnergyModel/*.pptx
 02-EnergyModel/*.png
+*.DS_Store
