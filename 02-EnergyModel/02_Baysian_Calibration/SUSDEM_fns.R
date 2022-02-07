@@ -1742,22 +1742,39 @@ CalReload <- function(epcdf){
   
   # No of rooms numeric check #### number of (heated) rooms #
   calepc$NoOfRooms <- epc_df$`number-heated-rooms`
-  word(df1$V1,1,sep = "\\|")
+  calepc$NoOfRooms <- as.numeric(gsub("\\..*$", "",calepc$NoOfRooms))
   
-  # No of storeys numeric check #### number of storeys (floors) #
-  calepc$NoOfStoreys
+  # No of storeys numeric check #### number of storeys (floors) # MISSING DATA VARIABLE!
+  calepc$NoOfStoreys <- epc_df$`floor-level`
+  calepc$NoOfStoreys <- as.numeric(gsub("\\..*$", "",calepc$NoOfStoreys))
   
   # External wall 1 reband #### wall construction type; 0 = cavity, 1 = solid brick, 2 = system built, 3 = timber frame #
-  calepc$ExternalWall1
+  calepc$ExternalWall1 <- epc_df$`walls-description`
+  calepc$ExternalWall1[c(which(grepl("Cavity", calepc$ExternalWall1)))] <- 0
+  calepc$ExternalWall1[which(grepl("Solid brick", calepc$ExternalWall1))] <- 1
+  calepc$ExternalWall1[which(grepl("System built", calepc$ExternalWall1))] <- 2
+  calepc$ExternalWall1[which(grepl("Timber frame", calepc$ExternalWall1))] <- 3
+  calepc$ExternalWall1 <- as.numeric(calepc$ExternalWall1)
   
   # External wall 2 reband #### wall insulation type; 0 = unknown, 1 = as built, 2 = external, 3 = filled cavity, 4 = not applicable #
-  calepc$ExternalWall2
+  calepc$ExternalWall2 <- epc_df$`walls-description`
+  calepc$ExternalWall2[c(which(grepl("assumed", calepc$ExternalWall2)))] <- 0
+  calepc$ExternalWall2[which(grepl("as built", calepc$ExternalWall2))] <- 1
+  calepc$ExternalWall2[which(grepl("external", calepc$ExternalWall2))] <- 2
+  calepc$ExternalWall2[which(grepl("filled cavity", calepc$ExternalWall2))] <- 3
+  calepc$ExternalWall2[which(grepl("not applicable", calepc$ExternalWall2))] <- 4
+  calepc$ExternalWall2 <- as.numeric(calepc$ExternalWall2)
   
-  # Window to wall ratio numeric check
-  calepc$WWR
+  # Window to wall ratio numeric check # MISSING DATA VARIABLE !
+  calepc$WWR <- epc_df$`glazed-area`
   
   # Floor Construction #### floor construction type; 0 = unknown, 1 = solid, 2 = suspended not timber, 3 = suspended timber #
-  calepc$FloorConstruction
+  calepc$FloorConstruction <-  epc_df$`floor-description`
+  calepc$FloorConstruction[c(which(grepl("Unknown", calepc$FloorConstruction)))] <- 0
+  calepc$FloorConstruction[which(grepl("Solid", calepc$FloorConstruction))] <- 1
+  #calepc$FloorConstruction[which(grepl("Suspended", calepc$FloorConstruction))] <- 2
+  calepc$FloorConstruction[which(grepl("Suspended", calepc$FloorConstruction))] <- 3
+  calepc$FloorConstruction <- as.numeric(calepc$FloorConstruction)
   
   # Double Glazing Percentage #### percentage of glazing that is double glazed #
   calepc$DoubleGlazingPercentageMain
