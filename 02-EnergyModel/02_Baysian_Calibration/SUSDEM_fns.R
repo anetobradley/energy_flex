@@ -1683,9 +1683,10 @@ UtilisationFactors <- function(GainRatio, LossRatio, ThermalMass, TotalArea, Ht,
 # thus enabling it to be used as a Calibration input.
 
 CalReload <- function(epcdf){
-  
+
+  require(stringr)
   calepc <- NULL
-  # # Building dimensions and geometry
+  # # Building dimensions and geometry #This has to be manually wrangled from a non-EPC source.
   # storeys = designParam$NoOfStoreys # vector for number of storeys
   # groundfloorareas = designParam$GroundFloorArea # vector for Ground floor area
   # groundfloorperimeters = designParam$GroundFloorPerimeter # vector for Ground floor perimeter
@@ -1697,8 +1698,8 @@ CalReload <- function(epcdf){
   # secondfloorperimeters = designParam$SecondFloorPerimeter # vector for Second floor perimeter
   # secondfloorheights = designParam$SecondFloorHeight # vector for Second floor height
   
-  
-  # lelpercentage = designParam$LELpercentage #matrix for low energy lighting percentage
+
+ # lelpercentage = designParam$LELpercentage #matrix for low energy lighting percentage
   
   # Reband Age #### UPDATED FOR SAP 2012 0 = pre-1900, 1 = 1900-29, 2 = 1930-49, 3 = 1950-66, 4 = 1967-75, 5 = 1976-82, 6 = 1983-1990, 7 = 1991-1995, 8 = 1996-2002, 9 = 2003-2006, 10 = 2007-2011, 11 = 2012 onwards
   calepc <- data.frame("AgeBandCode" = as.character(epc_df$`construction-age-band`))
@@ -1707,15 +1708,41 @@ CalReload <- function(epcdf){
   calepc$AgeBandCode[which(grepl("1900-1929", calepc$AgeBandCode))] <- 1
   calepc$AgeBandCode[which(grepl("1930-1949", calepc$AgeBandCode))] <- 2
   calepc$AgeBandCode[which(grepl("1950-1966", calepc$AgeBandCode))] <- 3
+  calepc$AgeBandCode[which(grepl("1967-1975", calepc$AgeBandCode))] <- 4
+  calepc$AgeBandCode[which(grepl("1976-1982", calepc$AgeBandCode))] <- 5
+  calepc$AgeBandCode[which(grepl("1983-1990", calepc$AgeBandCode))] <- 6
+  calepc$AgeBandCode[which(grepl("1991-1995", calepc$AgeBandCode))] <- 7
+  calepc$AgeBandCode[which(grepl("1996-2002", calepc$AgeBandCode))] <- 8
+  calepc$AgeBandCode[which(grepl("2003-2006", calepc$AgeBandCode))] <- 9
+  calepc$AgeBandCode[which(grepl("2007-2011", calepc$AgeBandCode))] <- 10
+  calepc$AgeBandCode[which(grepl("2018", calepc$AgeBandCode))] <- 11
+  calepc$AgeBandCode[which(grepl("2019", calepc$AgeBandCode))] <- 11
+  calepc$AgeBandCode[which(grepl("2020", calepc$AgeBandCode))] <- 11
+  calepc$AgeBandCode[which(grepl("2021", calepc$AgeBandCode))] <- 11
+  calepc$AgeBandCode[which(grepl("2012 onwards", calepc$AgeBandCode))] <- 11
+  
   
   # Reband Dwelling Type #### 1 = flat, 2 = house, 3 = maisonette, 0 = bungalow #
-  calepc$DwellingType
+  calepc$DwellingType <- epc_df$`property-type`
+  calepc$DwellingType[which(grepl("Bungalow", calepc$DwellingType))] <- 0
+  calepc$DwellingType[which(grepl("Flat", calepc$DwellingType))] <- 1
+  calepc$DwellingType[which(grepl("House", calepc$DwellingType))] <- 2
+  calepc$DwellingType[which(grepl("Maisonette", calepc$DwellingType))] <- 3
   
   # Reband Dwelling Position #### 0 = detached, 1 = end-terrace, 2 = mid-terrace, 3 = semi-detached, 4 = ground-floor, 5 = mid-floor, 6 = top-floor #
-  calepc$DwellingPosition
+  calepc$DwellingPosition  <- epc_df$`built-form`
+  calepc$FlatFloor <- epc_df$`flat-top-storey`
+  calepc$DwellingPosition[c(which(grepl("Detached", calepc$DwellingPosition)))] <- 0
+  calepc$DwellingPosition[which(grepl("End-Terrace", calepc$DwellingPosition))] <- 1
+  calepc$DwellingPosition[which(grepl("Mid-Terrace", calepc$DwellingPosition))] <- 2
+  calepc$DwellingPosition[which(grepl("Semi-Detached", calepc$DwellingPosition))] <- 3
+  #calepc$DwellingPosition[which(grepl("F", calepc$FlatFloor) & calepc$DwellingType == 1)] <- 4
+  calepc$DwellingPosition[which(grepl("F", calepc$FlatFloor) & calepc$DwellingType == 1)] <- 5
+  calepc$DwellingPosition[which(grepl("T", calepc$FlatFloor) & calepc$DwellingType == 1)] <- 6
   
   # No of rooms numeric check #### number of (heated) rooms #
-  calepc$NoOfRooms
+  calepc$NoOfRooms <- epc_df$`number-heated-rooms`
+  word(df1$V1,1,sep = "\\|")
   
   # No of storeys numeric check #### number of storeys (floors) #
   calepc$NoOfStoreys
