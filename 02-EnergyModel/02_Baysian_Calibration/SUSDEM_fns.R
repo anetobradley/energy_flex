@@ -1702,7 +1702,7 @@ CalReload <- function(epcdf){
  # lelpercentage = designParam$LELpercentage #matrix for low energy lighting percentage
   
   # Reband Age #### UPDATED FOR SAP 2012 0 = pre-1900, 1 = 1900-29, 2 = 1930-49, 3 = 1950-66, 4 = 1967-75, 5 = 1976-82, 6 = 1983-1990, 7 = 1991-1995, 8 = 1996-2002, 9 = 2003-2006, 10 = 2007-2011, 11 = 2012 onwards
-  calepc <- data.frame("AgeBandCode" = as.character(epc_df$`construction-age-band`))
+  calepc <- data.frame("AgeBandCode" = as.character(epcdf$`construction-age-band`))
   calepc$AgeBandCode <- as.character(calepc$AgeBandCode)
   calepc$AgeBandCode[c(which(grepl("before 1900", calepc$AgeBandCode)))] <- 0
   calepc$AgeBandCode[which(grepl("1900-1929", calepc$AgeBandCode))] <- 1
@@ -1723,14 +1723,14 @@ CalReload <- function(epcdf){
   
   
   # Reband Dwelling Type #### 1 = flat, 2 = house, 3 = maisonette, 0 = bungalow #
-  calepc$DwellingType <- epc_df$`property-type`
+  calepc$DwellingType <- epcdf$`property-type`
   calepc$DwellingType[which(grepl("Bungalow", calepc$DwellingType))] <- 0
   calepc$DwellingType[which(grepl("Flat", calepc$DwellingType))] <- 1
   calepc$DwellingType[which(grepl("House", calepc$DwellingType))] <- 2
   calepc$DwellingType[which(grepl("Maisonette", calepc$DwellingType))] <- 3
   
   # Reband Dwelling Position #### 0 = detached, 1 = end-terrace, 2 = mid-terrace, 3 = semi-detached, 4 = ground-floor, 5 = mid-floor, 6 = top-floor #
-  calepc$DwellingPosition  <- epc_df$`built-form`
+  calepc$DwellingPosition  <- epcdf$`built-form`
   calepc$FlatFloor <- epc_df$`flat-top-storey`
   calepc$DwellingPosition[c(which(grepl("Detached", calepc$DwellingPosition)))] <- 0
   calepc$DwellingPosition[which(grepl("End-Terrace", calepc$DwellingPosition))] <- 1
@@ -1741,15 +1741,15 @@ CalReload <- function(epcdf){
   calepc$DwellingPosition[which(grepl("T", calepc$FlatFloor) & calepc$DwellingType == 1)] <- 6
   
   # No of rooms numeric check #### number of (heated) rooms #
-  calepc$NoOfRooms <- epc_df$`number-heated-rooms`
+  calepc$NoOfRooms <- epcdf$`number-heated-rooms`
   calepc$NoOfRooms <- as.numeric(gsub("\\..*$", "",calepc$NoOfRooms))
   
   # No of storeys numeric check #### number of storeys (floors) # MISSING DATA VARIABLE!
-  calepc$NoOfStoreys <- epc_df$`floor-level`
+  calepc$NoOfStoreys <- epcdf$`floor-level`
   calepc$NoOfStoreys <- as.numeric(gsub("\\..*$", "",calepc$NoOfStoreys))
   
   # External wall 1 reband #### wall construction type; 0 = cavity, 1 = solid brick, 2 = system built, 3 = timber frame #
-  calepc$ExternalWall1 <- epc_df$`walls-description`
+  calepc$ExternalWall1 <- epcdf$`walls-description`
   calepc$ExternalWall1[c(which(grepl("Cavity", calepc$ExternalWall1)))] <- 0
   calepc$ExternalWall1[which(grepl("Solid brick", calepc$ExternalWall1))] <- 1
   calepc$ExternalWall1[which(grepl("System built", calepc$ExternalWall1))] <- 2
@@ -1757,7 +1757,7 @@ CalReload <- function(epcdf){
   calepc$ExternalWall1 <- as.numeric(calepc$ExternalWall1)
   
   # External wall 2 reband #### wall insulation type; 0 = unknown, 1 = as built, 2 = external, 3 = filled cavity, 4 = not applicable #
-  calepc$ExternalWall2 <- epc_df$`walls-description`
+  calepc$ExternalWall2 <- epcdf$`walls-description`
   calepc$ExternalWall2[c(which(grepl("assumed", calepc$ExternalWall2)))] <- 0
   calepc$ExternalWall2[which(grepl("as built", calepc$ExternalWall2))] <- 1
   calepc$ExternalWall2[which(grepl("external", calepc$ExternalWall2))] <- 2
@@ -1766,10 +1766,10 @@ CalReload <- function(epcdf){
   calepc$ExternalWall2 <- as.numeric(calepc$ExternalWall2)
   
   # Window to wall ratio numeric check # MISSING DATA VARIABLE !
-  calepc$WWR <- epc_df$`glazed-area`
+  calepc$WWR <- epcdf$`glazed-area`
   
   # Floor Construction #### floor construction type; 0 = unknown, 1 = solid, 2 = suspended not timber, 3 = suspended timber #
-  calepc$FloorConstruction <-  epc_df$`floor-description`
+  calepc$FloorConstruction <-  epcdf$`floor-description`
   calepc$FloorConstruction[c(which(grepl("Unknown", calepc$FloorConstruction)))] <- 0
   calepc$FloorConstruction[which(grepl("Solid", calepc$FloorConstruction))] <- 1
   #calepc$FloorConstruction[which(grepl("Suspended", calepc$FloorConstruction))] <- 2
@@ -1777,24 +1777,47 @@ CalReload <- function(epcdf){
   calepc$FloorConstruction <- as.numeric(calepc$FloorConstruction)
   
   # Double Glazing Percentage #### percentage of glazing that is double glazed #
-  calepc$DoubleGlazingPercentageMain
+  calepc$DoubleGlazingPercentageMain <-  as.numeric(epcdf$`multi-glaze-proportion`)
   
   # Space Heating #### 1=gas, 2=electric (dual tariff), 3=electric (standard), 0 = smokeless fuel #
-  calepc$SpaceHeating
+  calepc$SpaceHeating <- epcdf$`mainheat-description`
+  calepc$Tariff <- epcdf$`energy-tariff`
+  calepc$SpaceHeating[which(grepl("smokeless fuel", calepc$SpaceHeating))] <- 0
+  calepc$SpaceHeating[which(grepl("gas", calepc$SpaceHeating))] <- 1
+  calepc$SpaceHeating[which(grepl("dual", calepc$Tariff) & grepl("electric",calepc$SpaceHeating))] <- 2
+  calepc$SpaceHeating[which(grepl("standard", calepc$Tariff) & grepl("electric",calepc$SpaceHeating))] <- 3
   
   # Secondary Heating #### 1=gas, 2=electric, 0 = none #
-  calepc$SecondaryHeating
+  calepc$SecondaryHeating <- epcdf$`secondheat-description`
+  calepc$SecondaryHeating[which(grepl("None", calepc$SecondaryHeating))] <- 0
+  calepc$SecondaryHeating[which(grepl("gas", calepc$SecondaryHeating))] <- 1
+  calepc$SecondaryHeating[which(grepl("electric", calepc$SecondaryHeating))] <- 2
   
   # Water Heating #### 1=gas, 2=electric (dual tariff), 3=electric (standard), 4 = smokeless fuel, 0 = none #
-  calepc$WaterHeating
+  calepc$WaterHeating <- epcdf$`hotwater-description`
+  calepc$WaterHeating[which(grepl("No system", calepc$WaterHeating))] <- 0
+  calepc$WaterHeating[which(grepl("main system", calepc$WaterHeating) | calepc$SpaceHeating == 1)] <- 1
+  calepc$WaterHeating[which(grepl("Gas", calepc$WaterHeating))] <- 1
+  calepc$WaterHeating[which(grepl("Electric", calepc$WaterHeating) & grepl("standard", calepc$WaterHeating))] <- 3
+  calepc$WaterHeating[which(grepl("Electric", calepc$WaterHeating))] <- 2
   
-  # Cylinder Insulation #### hot water tank insulation thickness (mm) #
-  calepc$CylinderInsulation
+  # Cylinder Insulation #### hot water tank insulation thickness (mm) # NOT AVAILBLE
+  #calepc$CylinderInsulation
   
   # Roof Insulation #### roof insulation thickness in mm (retofit - normrnd(270,10)) #
-  calepc$RoofInsulation
+  calepc$RoofInsulation <- epcdf$`roof-description`
+  calepc$RoofInsulation[which(grepl("transmittance", calepc$RoofInsulation))] <- ""
+  calepc$RoofInsulation <- (gsub("[^0-9]","",calepc$RoofInsulation))
   
   # Boiler Efficiency #### efficiency of space heating boiler (divided by 100 to scale to 0-1) #
-  calepc$BoilerEfficiency
+  # We don';t have a direct measure of this in EPC so need to estimate
+  # Very Poor = 65%, Poor = 70%, Average = 75%, Good = 80%, Very Good = 85%
+  calepc$BoilerEfficiency <- epcdf$`mainheat-energy-eff`
+  calepc$BoilerEfficiency[c(which(grepl("Very Poor", calepc$BoilerEfficiency)))] <- 0.65
+  calepc$BoilerEfficiency[which(grepl("Poor", calepc$BoilerEfficiency))] <- 0.70
+  calepc$BoilerEfficiency[which(grepl("Average", calepc$BoilerEfficiency))] <- 0.75
+  calepc$BoilerEfficiency[which(grepl("Good", calepc$BoilerEfficiency))] <- 0.8
+  calepc$BoilerEfficiency[which(grepl("Very Good", calepc$BoilerEfficiency))] <- 0.85
   
-}
+return(calepc)
+  }
