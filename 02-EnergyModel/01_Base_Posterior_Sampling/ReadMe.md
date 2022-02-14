@@ -10,6 +10,7 @@ Here we present the steps taken to infer a posterior energy intensity distributi
 - [4. Bayesian Hierarchical Model](#4-bayesian-hierarchical-model)
 - [5. MCMC Sampling using Stan](#5-mcmc-sampling-using-stan)
 - [6. Notes on Data & Outputs](#6-notes-on-data-&-outputs)
+- [7. Running as Docker Container](#7-run-as-docker-container)
 
 ## 1. Data Sources
 
@@ -195,6 +196,37 @@ The plot below shows en example of the outputs from the MCMC sampling, with EPC 
 
 ![image](https://user-images.githubusercontent.com/66263560/130320020-e4f37ee9-db1a-40e8-a7b4-9a97068bec3e.png)
 
-## 7. Allocating Energy Intensity to Synthetic Population
+## 7. Running this Module 
 
-The script `Energy_Intensity_Allocator.R` categorises the synthetic households by their typology and randomly samples the posterior distribution for that typology to stochastically allocate an energy intensity to the household.
+To run the contents of this folder and estimate Energy Intensity posteriors for a given Local Authority you can either run run this in the R console (or RStudio) or you can build and run a Docker container using the Dockerfile provided.
+
+### 7.1 Running in RStudio
+To run this module in R follow these steps:
+1. Run the `install_packages.R` script in the R console.
+2. If you do not already have RStan installed you will need to install this and all pre-requisites following the [guidance](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started) 
+3. You will need to set as environment variables the parameters for the sampling run. 
+ ```r
+Sys.setenv(LOCAL_AUTHORITY = "EO9000014", 
+"MCMC_SAMPLES" = 2000,
+"MCMC_CHAINS" = 4,
+"BY_AGE" = TRUE,
+"AGE_BANDS" = 0,
+"GAS_TOGGLE" = FALSE)
+```
+4. Finally run the `Stan_Energy_intensity_Base.R` script - this can take a while and will detail sampler progress as you go.
+
+### 7.2 Running with Docker
+Alternatively instead of running the steps above you coiuld run this by building a Docker image using the Dockerfile provided and running this as a standalone process. To do this you will need to install Docker Desktop and in the console type the following command:
+```
+docker build -t local-energy-int --build-arg CHAINS=4 --build-arg SAMPLES=2000  \
+--build-arg AUTHORITY="E09000014" --build-arg AGE=TRUE --build-arg BANDS=0  \
+--build-arg GAS=FALSE .
+
+docker run local-energy-int
+```
+
+Note: You may run into some issues using Docker on Apple Silicon (arm64) machines as Stan's performance under emulation is poor (you essentially lose the benefits of having a multi-core processor as far as Stan is concerned).
+
+## 8. Allocating Energy Intensity to Synthetic Population
+
+The script `Energy_Intensity_Allocator.R` categorises the synthetic households by their typology and randomly samples the posterior distribution for that typology to stochastically allocate an energy intensity to the household. *This is not currently integrated into the Docker Container that the dockerfile in this repo builds.*
