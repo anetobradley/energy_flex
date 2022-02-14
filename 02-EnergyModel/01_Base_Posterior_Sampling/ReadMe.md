@@ -207,11 +207,11 @@ To run this module in R follow these steps:
 3. You will need to set as environment variables the parameters for the sampling run. 
  ```r
 Sys.setenv(LOCAL_AUTHORITY = "EO9000014", 
-"MCMC_SAMPLES" = 2000,
-"MCMC_CHAINS" = 4,
-"BY_AGE" = TRUE,
-"AGE_BANDS" = 0,
-"GAS_TOGGLE" = FALSE)
+MCMC_SAMPLES = 2000,
+MCMC_CHAINS = 4,
+BY_AGE = TRUE,
+AGE_BANDS = 0,
+GAS_TOGGLE = FALSE)
 ```
 4. Finally run the `Stan_Energy_intensity_Base.R` script - this can take a while and will detail sampler progress as you go.
 
