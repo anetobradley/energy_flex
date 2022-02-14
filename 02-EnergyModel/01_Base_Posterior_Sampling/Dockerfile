@@ -16,31 +16,32 @@ RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
                    clang
 
+
 # Global site-wide config
 RUN mkdir -p $HOME/.R/ \
     && echo "\nCXX=clang++ -ftemplate-depth-256\n" >> $HOME/.R/Makevars \
+    && echo "CXXFLAGS=-O3 -mtune=native -march=native" >> $HOME/.R/Makevars \
     && echo "CC=clang\n" >> $HOME/.R/Makevars
 
 RUN install2.r --error --deps TRUE \
    rstan \
    && rm -rf /tmp/downloaded_packages/ /tmp/*.rds
 
-
 RUN Rscript /code/install_packages.R
 
-#ARG CHAINS
-#ARG SAMPLES
-#ARG AUTHORITY
-#ARG AGE
-#ARG BANDS
-#ARG GAS
+ARG CHAINS
+ARG SAMPLES
+ARG AUTHORITY
+ARG AGE
+ARG BANDS
+ARG GAS
 
-#ENV LOCAL_AUTHORITY ${AUTHORITY}
-#ENV MCMC_SAMPLES ${SAMPLES}
-#ENV MCMC_CHAINS ${CHAINS}
-#ENV BY_AGE ${AGE}
-#ENV AGE_BANDS ${BANDS}
-#ENV GAS_TOGGLE ${GAS}
+ENV LOCAL_AUTHORITY ${AUTHORITY}
+ENV MCMC_SAMPLES ${SAMPLES}
+ENV MCMC_CHAINS ${CHAINS}
+ENV BY_AGE ${AGE}
+ENV AGE_BANDS ${BANDS}
+ENV GAS_TOGGLE ${GAS}
 
 CMD Rscript /code/Stan_Energy_Intensity_Base.R 
 #CMD sleep 24h
