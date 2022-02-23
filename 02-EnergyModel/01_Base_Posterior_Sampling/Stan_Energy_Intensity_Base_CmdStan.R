@@ -221,20 +221,20 @@ set.seed(2019)
 #library(rstan)
 #library(bayesplot)
 
-options(mc.cores = parallel::detectCores())
-rstan_options(auto_write = TRUE)
+#options(mc.cores = parallel::detectCores())
+#rstan_options(auto_write = TRUE)
 #Sys.setenv(LOCAL_CPPFLAGS = '-march=corei7 -mtune=corei7')
 
 # LOAD ENV Vars #
-samples_mcmc <- as.numeric(Sys.getenv("MCMC_SAMPLES"))
+#samples_mcmc <- as.numeric(Sys.getenv("MCMC_SAMPLES"))
 
-if(samples_mcmc > 4000){
-  warmup_mcmc <- 1000
-} else {
-  warmup_mcmc <- (samples_mcmc*0.25)
-}
+# if(samples_mcmc > 4000){
+#   warmup_mcmc <- 1000
+# } else {
+#   warmup_mcmc <- (samples_mcmc*0.25)
+# }
 
-chains_mcmc <- as.numeric(Sys.getenv("MCMC_CHAINS"))
+#chains_mcmc <- as.numeric(Sys.getenv("MCMC_CHAINS"))
 
 LAD_block <- Sys.getenv("LOCAL_AUTHORITY")
 
@@ -393,41 +393,61 @@ for(i in LAD_List$LAD20CD){
   epc_df_cl$E_CONS_sqrt <- sqrt(as.numeric(epc_df_cl$`energy-consumption-current`))
   epc_df_cl$E_CONS_normal <- (epc_df_cl$E_CONS_sqrt - mean(NEED_data_typecast$E_TOT_sqrt))/sd(NEED_data_typecast$E_TOT_sqrt)
   
+  # create data as list for input to Stan
+  stan_data <- list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
+                               M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
+                               T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
+                               E_N = NEED_data_typecast$E_TOT_normal ,
+                               E_M = epc_df_cl$E_CONS_normal,
+                               sigma_N = 1,
+                               tn = as.numeric(NEED_data_typecast$group),
+                               tm = as.numeric(epc_df_cl$group)
+                    )
   
-  epc_priors <- stanc(file = "EPC_Prior_Sampling.stan") # Check Stan file
-  epc_priors_model <- stan_model(stanc_ret = epc_priors)
-  epc_priors_haringey<- sampling(epc_priors_model, iter=samples_mcmc, seed=2019, warmup=warmup_mcmc,
-                                 chains=chains_mcmc,
-                                 refresh = 100,
-                                 data=list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
-                                           M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
-                                           T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
-                                           E_N = NEED_data_typecast$E_TOT_normal ,
-                                           E_M = epc_df_cl$E_CONS_normal,
-                                           sigma_N = 1,
-                                           tn = as.numeric(NEED_data_typecast$group),
-                                           tm = as.numeric(epc_df_cl$group)
-                                 ),
-                                 control = list(#max_treedepth = 10,
-                                   adapt_delta = 0.8
-                                 )
+  mod <- cmdstan_model("EPC_Prior_Sampling.stan")
+  
+  epc_priors_haringey <- mod$sample(data = stan_data,   seed = 2019, 
+                    chains = 4, 
+                    parallel_chains = 4,
+                    refresh = 250,
+                    adapt_delta=0.8, 
+                    max_treedepth=10)
+  
+  
+  #epc_priors <- stanc(file = "EPC_Prior_Sampling.stan") # Check Stan file
+  #epc_priors_model <- stan_model(stanc_ret = epc_priors)
+  #epc_priors_haringey<- sampling(epc_priors_model, iter=samples_mcmc, seed=2019, warmup=warmup_mcmc,
+                                 # chains=chains_mcmc,
+                                 # refresh = 100,
+                                 # data=list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
+                                 #           M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
+                                 #           T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
+                                 #           E_N = NEED_data_typecast$E_TOT_normal ,
+                                 #           E_M = epc_df_cl$E_CONS_normal,
+                                 #           sigma_N = 1,
+                                 #           tn = as.numeric(NEED_data_typecast$group),
+                                 #           tm = as.numeric(epc_df_cl$group)
+                                 # ),
+                                 # control = list(#max_treedepth = 10,
+                                 #   adapt_delta = 0.8
+                                 # )
   )
   
   #save(epc_priors_haringey, file="20210817_EPC_Haringey_Prior.RData")
   
   # EXTRACT DATAFRAME FROM MODEL OUTPUTS FOR PLOTS #
   
-  epc_mcmc_dist <- epc_priors_haringey %>% 
-    rstan::extract()  
+  # epc_mcmc_dist <- epc_priors_haringey %>% 
+  #   rstan::extract()  
   
-  E_prior_mean <- as.data.frame(epc_mcmc_dist$E)
-  E_prior_mean$sigma <- (epc_mcmc_dist$sigma)
+  E_prior_mean <- as.data.frame(epc_priors_haringey$draws(format="df", variables=c("E"))[,1:24])
+  E_prior_sigma <- epc_priors_haringey$draws(format="df", variables=c("sigma"))[,1]
   
   reverse_convert <- function(mu,sig){
     eint <- ((rnorm(1,mu,sig)*sd(NEED_data_typecast$E_TOT_sqrt))+mean(NEED_data_typecast$E_TOT_sqrt))^2
   }
   
-  E_posterior <- as.data.frame(lapply(colnames(as.data.frame(epc_mcmc_dist$E)), function(i){mapply(reverse_convert, mu=E_prior_mean[,i], sig=E_prior_mean$sigma)}))
+  E_posterior <- as.data.frame(lapply(colnames(E_prior_mean[1:24]), function(i){mapply(reverse_convert, mu=E_prior_mean[,i], sig=E_prior_sigma)}))
   colnames(E_posterior) <- c(1:length(unique(NEED_data_typecast$group)))
   
   require(reshape2)
