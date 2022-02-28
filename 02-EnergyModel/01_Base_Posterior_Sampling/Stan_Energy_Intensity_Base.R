@@ -374,6 +374,25 @@ for(i in LAD_List$LAD20CD){
   
   #epc_df_cl$E_INT <- as.numeric(epc_df_cl$`energy-consumption-current`)/as.numeric(epc_df_cl$`total-floor-area`)
   
+  # EFFICIENCY PATCH: EPC SAMPLE REDUX
+  # This function samples down to a maximum size of 1920 (80 records per typology)
+epc_sample_redux <- function(dataset){
+  replacement <- NULL
+  for(i in 1:24){
+    if(sum(dataset$group == i)<=80){
+      replacement <- rbind(replacement, dataset[which(dataset$group == i),])
+    }
+    else{
+      replacement <- rbind(replacement, dataset[sample(length(dataset$group == i), 80),])
+    }
+    
+  }
+ return(replacement)
+}
+
+epc_df_cl <- epc_sample_redux(epc_df_cl)
+
+
   if(gas_toggle==TRUE){
     epc_df_cl[,"group"] <- epc_df_cl$group + (length(unique(epc_df_cl$group))*as.numeric(epc_df_cl$`mains-gas-flag`=="Y"))
   }
