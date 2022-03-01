@@ -6,18 +6,18 @@
 # New function based on SAP 2012 STP11-SR01 method for calulcating solar radiation
 # Output to mimic original SUSDEM inputs, namely (1 external air temp column, 
 # 8 orientations of N, NE, E SE, S, SW, W, NW)
-Weather_input <- function(wd){
+Weather_input <- function(wd,latitude){
   
   # Vectors of ABC constant equation coefficients
-  k1 <- c(26.3, 0.165, 1.44, -2.95, -0.660, -2.95, 1.44, 0.165, 26.3)
-  k2 <- c(-38.5, -3.68, -2.36, 2.89, -0.106, 2.89, -2.36, -3.68, -38.5)
-  k3 <- c(14.8, 3.0, 1.07, 1.17, 2.93, 1.17, 1.07, 3.0, 14.8)
-  k4 <- c(-16.5, 6.38, -0.514, 5.67, 3.63, 5.67, -0.514, 6.38, -16.5)
-  k5 <- c(27.3, -4.53, 1.89, -3.54, -0.374, -3.54, 1.89, -4.53, 27.3)
-  k6 <- c(-11.9, -0.41, -1.64, -4.28, -7.40, -4.28, -1.64, -0.41, -11.9)
-  k7 <- c(-1.060, -4.38, -0.542, -2.72, -2.71, -2.72, -0.542, -4.38, -1.060)
-  k8 <- c(0.087, 4.89, -0.757, -0.250, -0.991, -0.250, -0.757, 4.89, 0.087)
-  k9 <- c(-0.191, -1.99, 0.604, 3.07, 4.59, 3.07, 0.604, -1.99, -0.191)
+  k1 <- c(-2.95, -0.660, -2.95, 1.44, 0.165, 26.3, 0.165, 1.44)
+  k2 <- c(2.89, -0.106, 2.89, -2.36, -3.68, -38.5, -3.68, -2.36)
+  k3 <- c(1.17, 2.93, 1.17, 1.07, 3.0, 14.8, 3.0, 1.07)
+  k4 <- c( 5.67, 3.63, 5.67, -0.514, 6.38, -16.5, 6.38, -0.514)
+  k5 <- c(-3.54, -0.374, -3.54, 1.89, -4.53, 27.3, -4.53, 1.89)
+  k6 <- c(-4.28, -7.40, -4.28, -1.64, -0.41, -11.9, -0.41, -1.64)
+  k7 <- c(-2.72, -2.71, -2.72, -0.542, -4.38, -1.060, -4.38, -0.542)
+  k8 <- c(-0.250, -0.991, -0.250, -0.757, 4.89, 0.087, 4.89, -0.757)
+  k9 <- c(3.07, 4.59, 3.07, 0.604, -1.99, -0.191, -1.99, 0.604)
   
   sol_dec <- c(-20.9, -13.0, -2.4, 9.4, 18.8, 23.1, 21.2, 13.5, 2.2, -9.6, -18.9, -23.0)
   
@@ -37,21 +37,21 @@ Weather_input <- function(wd){
   }
   
   RH <- function(Acon,Bcon,Ccon,lat,dec){
-    Rh <- (Acon*(cos((lat-dec)*pi/2))^2) + (Bcon*(cos((lat-dec)*pi/2))) + Ccon
+    Rh <- (Acon*(cos((lat-dec)*pi/180))^2) + (Bcon*(cos((lat-dec)*pi/180))) + Ccon
   }
-  
+
   INT_A <- NULL
-  for(i in 1:9){
+  for(i in 1:8){
     INT_A[i] <- A_fn(k1[i],k2[i],k3[i])
   }
   
   INT_B <- NULL
-  for(i in 1:9){
+  for(i in 1:8){
     INT_B[i] <- B_fn(k4[i],k5[i],k6[i])
   }
   
   INT_C <- NULL
-  for(i in 1:9){
+  for(i in 1:8){
     INT_C[i] <- C_fn(k7[i],k8[i],k9[i])
   }
   
@@ -59,12 +59,12 @@ Weather_input <- function(wd){
   INT_RH <- NULL
   
   for(i in 1:12){
-    for(k in 1:9){
+    for(k in 1:8){
       INT_RH[k] <- RH(INT_A[k],INT_B[k],INT_C[k],latitude,sol_dec[i])
     }
     IRR_RH <- rbind(IRR_RH,INT_RH)
-  }  
-  
+  }
+ 
   IRR_SURF <- IRR_RH * wd[,2]
   
   weather_out <- list("weather" = matrix(data = c(wd[,3],IRR_SURF, wd[,2]), nrow=12))
@@ -1130,19 +1130,7 @@ CalReload <- function(epcdf){
   require(stringr)
   calepc <- NULL
   # # Building dimensions and geometry #This has to be manually wrangled from a non-EPC source.
-  # storeys = designParam$NoOfStoreys # vector for number of storeys
-  # groundfloorareas = designParam$GroundFloorArea # vector for Ground floor area
-  # groundfloorperimeters = designParam$GroundFloorPerimeter # vector for Ground floor perimeter
-  # groundfloorheights = designParam$GroundFloorHeight # vector for Ground floor height
-  # firstfloorareas = designParam$FirstFloorArea # vector for First floor area
-  # firstfloorperimeters = designParam$FirstFloorPerimeter # vector for First floor perimeter
-  # firstfloorheights = designParam$FirstFloorHeight # vector for First floor height
-  # secondfloorareas = designParam$SecondFloorArea # vector for Second floor area
-  # secondfloorperimeters = designParam$SecondFloorPerimeter # vector for Second floor perimeter
-  # secondfloorheights = designParam$SecondFloorHeight # vector for Second floor height
-  
-
- # lelpercentage = designParam$LELpercentage #matrix for low energy lighting percentage
+  #storeys = designParam$NoOfStoreys # vector for number of storeys
   
   # Reband Age #### UPDATED FOR SAP 2012 0 = pre-1900, 1 = 1900-29, 2 = 1930-49, 3 = 1950-66, 4 = 1967-75, 5 = 1976-82, 6 = 1983-1990, 7 = 1991-1995, 8 = 1996-2002, 9 = 2003-2006, 10 = 2007-2011, 11 = 2012 onwards
   calepc <- data.frame("AgeBandCode" = as.character(epcdf$`construction-age-band`))
@@ -1163,6 +1151,7 @@ CalReload <- function(epcdf){
   calepc$AgeBandCode[which(grepl("2020", calepc$AgeBandCode))] <- 11
   calepc$AgeBandCode[which(grepl("2021", calepc$AgeBandCode))] <- 11
   calepc$AgeBandCode[which(grepl("2012 onwards", calepc$AgeBandCode))] <- 11
+  #calepc$AgeBandCode <- as.numeric(calepc$AgeBandCode)
   
   
   # Reband Dwelling Type #### 1 = flat, 2 = house, 3 = maisonette, 0 = bungalow #
@@ -1171,10 +1160,11 @@ CalReload <- function(epcdf){
   calepc$DwellingType[which(grepl("Flat", calepc$DwellingType))] <- 1
   calepc$DwellingType[which(grepl("House", calepc$DwellingType))] <- 2
   calepc$DwellingType[which(grepl("Maisonette", calepc$DwellingType))] <- 3
+  #calepc$DwellingType <- as.numeric(calepc$DwellingType)
   
   # Reband Dwelling Position #### 0 = detached, 1 = end-terrace, 2 = mid-terrace, 3 = semi-detached, 4 = ground-floor, 5 = mid-floor, 6 = top-floor #
   calepc$DwellingPosition  <- epcdf$`built-form`
-  calepc$FlatFloor <- epc_df$`flat-top-storey`
+  calepc$FlatFloor <- epcdf$`flat-top-storey`
   calepc$DwellingPosition[c(which(grepl("Detached", calepc$DwellingPosition)))] <- 0
   calepc$DwellingPosition[which(grepl("End-Terrace", calepc$DwellingPosition))] <- 1
   calepc$DwellingPosition[which(grepl("Mid-Terrace", calepc$DwellingPosition))] <- 2
@@ -1182,6 +1172,7 @@ CalReload <- function(epcdf){
   #calepc$DwellingPosition[which(grepl("F", calepc$FlatFloor) & calepc$DwellingType == 1)] <- 4
   calepc$DwellingPosition[which(grepl("F", calepc$FlatFloor) & calepc$DwellingType == 1)] <- 5
   calepc$DwellingPosition[which(grepl("T", calepc$FlatFloor) & calepc$DwellingType == 1)] <- 6
+  #calepc$DwellingPosition <- as.numeric(calepc$DwellingPosition)
   
   # No of rooms numeric check #### number of (heated) rooms #
   calepc$NoOfRooms <- epcdf$`number-heated-rooms`
@@ -1197,7 +1188,7 @@ CalReload <- function(epcdf){
   calepc$ExternalWall1[which(grepl("Solid brick", calepc$ExternalWall1))] <- 1
   calepc$ExternalWall1[which(grepl("System built", calepc$ExternalWall1))] <- 2
   calepc$ExternalWall1[which(grepl("Timber frame", calepc$ExternalWall1))] <- 3
-  calepc$ExternalWall1 <- as.numeric(calepc$ExternalWall1)
+  #calepc$ExternalWall1 <- as.numeric(calepc$ExternalWall1)
   
   # External wall 2 reband #### wall insulation type; 0 = unknown, 1 = as built, 2 = external, 3 = filled cavity, 4 = not applicable #
   calepc$ExternalWall2 <- epcdf$`walls-description`
@@ -1206,18 +1197,23 @@ CalReload <- function(epcdf){
   calepc$ExternalWall2[which(grepl("external", calepc$ExternalWall2))] <- 2
   calepc$ExternalWall2[which(grepl("filled cavity", calepc$ExternalWall2))] <- 3
   calepc$ExternalWall2[which(grepl("not applicable", calepc$ExternalWall2))] <- 4
-  calepc$ExternalWall2 <- as.numeric(calepc$ExternalWall2)
+  #calepc$ExternalWall2 <- as.numeric(calepc$ExternalWall2)
   
   # Window to wall ratio numeric check # MISSING DATA VARIABLE !
   calepc$WWR <- epcdf$`glazed-area`
+  calepc$WWR[c(which(grepl("Normal", calepc$WWR)))] <- 0
+  calepc$WWR[which(grepl("Less Than Typical", calepc$WWR))] <- 0
+  calepc$WWR[which(grepl("More Than Typical", calepc$WWR))] <- 1
+  #calepc$WWR <- as.numeric(calepc$WWR)
   
   # Floor Construction #### floor construction type; 0 = unknown, 1 = solid, 2 = suspended not timber, 3 = suspended timber #
   calepc$FloorConstruction <-  epcdf$`floor-description`
   calepc$FloorConstruction[c(which(grepl("Unknown", calepc$FloorConstruction)))] <- 0
+  calepc$FloorConstruction[c(which(grepl("(another dwelling below)", calepc$FloorConstruction)))] <- 0
   calepc$FloorConstruction[which(grepl("Solid", calepc$FloorConstruction))] <- 1
   #calepc$FloorConstruction[which(grepl("Suspended", calepc$FloorConstruction))] <- 2
   calepc$FloorConstruction[which(grepl("Suspended", calepc$FloorConstruction))] <- 3
-  calepc$FloorConstruction <- as.numeric(calepc$FloorConstruction)
+  #calepc$FloorConstruction <- as.numeric(calepc$FloorConstruction)
   
   # Double Glazing Percentage #### percentage of glazing that is double glazed #
   calepc$DoubleGlazingPercentageMain <-  as.numeric(epcdf$`multi-glaze-proportion`)
@@ -1229,12 +1225,14 @@ CalReload <- function(epcdf){
   calepc$SpaceHeating[which(grepl("gas", calepc$SpaceHeating))] <- 1
   calepc$SpaceHeating[which(grepl("dual", calepc$Tariff) & grepl("electric",calepc$SpaceHeating))] <- 2
   calepc$SpaceHeating[which(grepl("standard", calepc$Tariff) & grepl("electric",calepc$SpaceHeating))] <- 3
+  #calepc$SpaceHeating <- as.numeric(calepc$SpaceHeating)
   
   # Secondary Heating #### 1=gas, 2=electric, 0 = none #
   calepc$SecondaryHeating <- epcdf$`secondheat-description`
   calepc$SecondaryHeating[which(grepl("None", calepc$SecondaryHeating))] <- 0
   calepc$SecondaryHeating[which(grepl("gas", calepc$SecondaryHeating))] <- 1
   calepc$SecondaryHeating[which(grepl("electric", calepc$SecondaryHeating))] <- 2
+  #calepc$SecondaryHeating <- as.numeric(calepc$SecondaryHeating)
   
   # Water Heating #### 1=gas, 2=electric (dual tariff), 3=electric (standard), 4 = smokeless fuel, 0 = none #
   calepc$WaterHeating <- epcdf$`hotwater-description`
@@ -1243,6 +1241,7 @@ CalReload <- function(epcdf){
   calepc$WaterHeating[which(grepl("Gas", calepc$WaterHeating))] <- 1
   calepc$WaterHeating[which(grepl("Electric", calepc$WaterHeating) & grepl("standard", calepc$WaterHeating))] <- 3
   calepc$WaterHeating[which(grepl("Electric", calepc$WaterHeating))] <- 2
+  #calepc$WaterHeating <- as.numeric(calepc$WaterHeating)
   
   # Cylinder Insulation #### hot water tank insulation thickness (mm) # NOT AVAILBLE
   #calepc$CylinderInsulation
@@ -1251,6 +1250,7 @@ CalReload <- function(epcdf){
   calepc$RoofInsulation <- epcdf$`roof-description`
   calepc$RoofInsulation[which(grepl("transmittance", calepc$RoofInsulation))] <- ""
   calepc$RoofInsulation <- (gsub("[^0-9]","",calepc$RoofInsulation))
+  #calepc$RoofInsulation <- as.numeric(calepc$RoofInsulation)
   
   # Boiler Efficiency #### efficiency of space heating boiler (divided by 100 to scale to 0-1) #
   # We don';t have a direct measure of this in EPC so need to estimate
@@ -1261,6 +1261,207 @@ CalReload <- function(epcdf){
   calepc$BoilerEfficiency[which(grepl("Average", calepc$BoilerEfficiency))] <- 0.75
   calepc$BoilerEfficiency[which(grepl("Good", calepc$BoilerEfficiency))] <- 0.8
   calepc$BoilerEfficiency[which(grepl("Very Good", calepc$BoilerEfficiency))] <- 0.85
+  #calepc$BoilerEfficiency <- as.numeric(calepc$BoilerEfficiency)
   
+  calepc$GroundFloorHeight <- as.numeric(epcdf$`floor-height`) # vector for Ground floor height
+  calepc$FirstFloorHeight <- 0 # vector for First floor height
+  calepc$SecondFloorHeight <- 0# vector for Second floor height
+  
+  calepc$LELpercentage <- as.numeric(epcdf$`low-energy-lighting`)#matrix for low energy lighting percentage
+  
+  calepc$uprn <- as.numeric(epcdf$`uprn`)
+  
+  # Finally we need to add the grouping classification of typologies that we are
+  # using (1-24)
+  
+  typology_parser <- function(x,y){
+    if(x=="Bungalow" && y==101){
+      type = 1
+    }
+    else if(x=="Bungalow" && y==102){
+      type = 2
+    }
+    else if(x=="Bungalow" && y==103){
+      type = 3
+    }
+    else if(x=="Bungalow" && y==104){
+      type = 4
+    }
+    else if(x=="Detatched" && y==101){
+      type = 5
+    }
+    else if(x=="Detatched" && y==102){
+      type = 6
+    }
+    else if(x=="Detatched" && y==103){
+      type = 7
+    }
+    else if(x=="Detatched" && y==104){
+      type = 8
+    }
+    else if(x=="End terrace" && y==101){
+      type = 9
+    }
+    else if(x=="End terrace" && y==102){
+      type = 10
+    }
+    else if(x=="End terrace" && y==103){
+      type = 11
+    }
+    else if(x=="End terrace" && y==104){
+      type = 12
+    }
+    else if(x=="Flat" && y==101){
+      type = 13
+    }
+    else if(x=="Flat" && y==102){
+      type = 14
+    }
+    else if(x=="Flat" && y==103){
+      type = 15
+    }
+    else if(x=="Flat" && y==104){
+      type = 16
+    }
+    else if(x=="Mid terrace" && y==101){
+      type = 17
+    }
+    else if(x=="Mid terrace" && y==102){
+      type = 18
+    }
+    else if(x=="Mid terrace" && y==103){
+      type = 19
+    }
+    else if(x=="Mid terrace" && y==104){
+      type = 20
+    }
+    else if(x=="Semi detached" && y==101){
+      type = 21
+    }
+    else if(x=="Semi detached" && y==102){
+      type = 22
+    }
+    else if(x=="Semi detached" && y==103){
+      type = 23
+    }
+    else if(x=="Semi detached" && y==104){
+      type = 24
+    }else{
+      type=NA
+    }
+  }
+  
+  epc_age_band_convert <- function(epc_age){
+    if(epc_age == "2018"){
+      NEED_AGE_BANDS <- 104
+    }
+    else if(epc_age == "2020"){
+      NEED_AGE_BANDS <- 104
+    }
+    else if(epc_age == "2019"){
+      NEED_AGE_BANDS <- 104
+    }
+    else if(epc_age == "2021"){
+      NEED_AGE_BANDS <- 104
+    }
+    else if(epc_age == "England and Wales: 2003-2006"){
+      NEED_AGE_BANDS <- 104
+    }
+    else if(epc_age == "England and Wales: 2007-2011"){
+      NEED_AGE_BANDS <- 104
+    }
+    else if(epc_age == "England and Wales: 2012 onwards"){
+      NEED_AGE_BANDS <- 104
+    }
+    else if(epc_age == "England and Wales: 2007 onwards"){
+      NEED_AGE_BANDS <- 104
+    }
+    else if(epc_age == "England and Wales: before 1900"){
+      NEED_AGE_BANDS <- 101
+    }
+    else if(epc_age == "England and Wales: 1900-1929"){
+      NEED_AGE_BANDS <- 101
+    }
+    else if(epc_age == "England and Wales: 1930-1949"){
+      NEED_AGE_BANDS <- 102
+    }
+    else if(epc_age == "England and Wales: 1950-1966"){
+      NEED_AGE_BANDS <- 102
+    }
+    else if(epc_age == "England and Wales: 1967-1975"){
+      NEED_AGE_BANDS <- 102
+    }
+    else if(epc_age == "England and Wales: 1976-1982"){
+      NEED_AGE_BANDS <- 103
+    }
+    else if(epc_age == "England and Wales: 1983-1990"){
+      NEED_AGE_BANDS <- 103
+    }
+    else if(epc_age == "England and Wales: 1991-1995"){
+      NEED_AGE_BANDS <- 103
+    }
+    else if(epc_age == "England and Wales: 1996-2002"){
+      NEED_AGE_BANDS <- 103
+    }else{
+      NEED_AGE_BANDS <- NA
+    }
+  }
+  
+  calepc$NEED_AGE_BANDS <- as.vector(unlist(lapply(epcdf$`construction-age-band`, epc_age_band_convert)))
+  
+  epc_built_type_convert <- function(epc_type, epc_form){
+    if(epc_type=="Bungalow" && epc_form != ""){
+      built_type = "Bungalow"
+    }
+    else if(epc_type=="Flat" && epc_form != ""){
+      built_type = "Flat"
+    }
+    else if(epc_type=="House" && epc_form == "Detached"){
+      built_type = "Detatched"
+    }
+    else if(epc_type=="Maisonette" && epc_form == "Detached"){
+      built_type = "Detatched"
+    }
+    else if(epc_type=="House" && epc_form == "Enclosed End-Terrace"){
+      built_type = "End terrace"
+    }
+    else if(epc_type=="Maisonette" && epc_form == "Enclosed End-Terrace"){
+      built_type = "End terrace"
+    }
+    else if(epc_type=="House" && epc_form == "End-Terrace"){
+      built_type = "End terrace"
+    }
+    else if(epc_type=="Maisonette" && epc_form == "End-Terrace"){
+      built_type = "End terrace"
+    }
+    else if(epc_type=="House" && epc_form == "Enclosed Mid-Terrace"){
+      built_type = "Mid terrace"
+    }
+    else if(epc_type=="Maisonette" && epc_form == "Enclosed Mid-Terrace"){
+      built_type = "Mid terrace"
+    }
+    else if(epc_type=="House" && epc_form == "Mid-Terrace"){
+      built_type = "Mid terrace"
+    }
+    else if(epc_type=="Maisonette" && epc_form == "Mid-Terrace"){
+      built_type = "Mid terrace"
+    }
+    else if(epc_type=="House" && epc_form == "Semi-Detached"){
+      built_type = "Semi detached"
+    }
+    else if(epc_type=="Maisonette" && epc_form == "Semi-Detached"){
+      built_type = "Semi detached"
+    }else{
+      built_type <- NA
+    }
+  }
+  
+  calepc$NEED_TYPE <- as.vector(unlist(mapply(epc_built_type_convert, epc_type=epcdf$`property-type`,  epc_form = epcdf$`built-form`)))
+  
+  calepc <- filter(calepc,!is.na(`NEED_TYPE`))
+  calepc <- filter(calepc,!is.na(`NEED_AGE_BANDS`))
+  
+  calepc$group <- as.vector((mapply(typology_parser, x=calepc$NEED_TYPE, y=calepc$NEED_AGE_BANDS)))
+
 return(calepc)
   }
