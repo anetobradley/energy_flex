@@ -1,4 +1,4 @@
-# Stan_Energy_Intensity_Base_CmdStan.R
+# Stan_Energy_Intensity_Base_CmdStan_Postcode.R
 # This runs a multilevel Bayesian regression model using publicly 
 # available data to produce base energy intensity distributions for 
 # Microsimulation model. 
@@ -25,7 +25,7 @@
 # 
 # Ei[j] ~ N(mu_E, sigma_E)
 # 
-
+#LAD_List <- data.frame("LAD20CD" = c("CB1","CB3","CB4","CB5","CB24","CB25","PE1","PE2","PE3","PE4","PE6"))
 require(dplyr)
 require(cmdstanr)
 
@@ -241,11 +241,11 @@ set.seed(2019)
 #LAD_List <- read.csv("nlac2011.csv") %>%
 #  filter(grepl(LAD_block, LAD20CD))
 
-E_posterior_all <- NULL
+E_posterior_all_postcode <- NULL
 
 for(i in LAD_List$LAD20CD){
   
-  epc_df <- EPC_Search(i)
+  epc_df <- EPC_Search_postcode(i)
   
   # Need to match age bands (approximately)
   
@@ -414,42 +414,42 @@ for(i in LAD_List$LAD20CD){
   
   # create data as list for input to Stan
   stan_data <- list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
-                               M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
-                               T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
-                               E_N = NEED_data_typecast$E_TOT_normal ,
-                               E_M = epc_df_cl$E_CONS_normal,
-                               sigma_N = 1,
-                               tn = as.numeric(NEED_data_typecast$group),
-                               tm = as.numeric(epc_df_cl$group)
-                    )
+                    M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
+                    T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
+                    E_N = NEED_data_typecast$E_TOT_normal ,
+                    E_M = epc_df_cl$E_CONS_normal,
+                    sigma_N = 1,
+                    tn = as.numeric(NEED_data_typecast$group),
+                    tm = as.numeric(epc_df_cl$group)
+  )
   
   mod <- cmdstan_model("EPC_Prior_Sampling.stan")
   
   epc_priors_haringey <- mod$sample(data = stan_data,   seed = 2019, 
-                    chains = 4, 
-                    parallel_chains = 4,
-                    refresh = 250,
-                    adapt_delta=0.8, 
-                    max_treedepth=10)
+                                    chains = 4, 
+                                    parallel_chains = 4,
+                                    refresh = 250,
+                                    adapt_delta=0.8, 
+                                    max_treedepth=10)
   
   
   #epc_priors <- stanc(file = "EPC_Prior_Sampling.stan") # Check Stan file
   #epc_priors_model <- stan_model(stanc_ret = epc_priors)
   #epc_priors_haringey<- sampling(epc_priors_model, iter=samples_mcmc, seed=2019, warmup=warmup_mcmc,
-                                 # chains=chains_mcmc,
-                                 # refresh = 100,
-                                 # data=list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
-                                 #           M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
-                                 #           T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
-                                 #           E_N = NEED_data_typecast$E_TOT_normal ,
-                                 #           E_M = epc_df_cl$E_CONS_normal,
-                                 #           sigma_N = 1,
-                                 #           tn = as.numeric(NEED_data_typecast$group),
-                                 #           tm = as.numeric(epc_df_cl$group)
-                                 # ),
-                                 # control = list(#max_treedepth = 10,
-                                 #   adapt_delta = 0.8
-                                 # )
+  # chains=chains_mcmc,
+  # refresh = 100,
+  # data=list(N = length(NEED_data_typecast$E_TOT_normal), # Number of instances in the NEED Data
+  #           M = length(epc_df_cl$E_CONS_normal),# Number of instances in the EPC data for specific region
+  #           T = length(unique(NEED_data_typecast$group)),# Number of households typology groups
+  #           E_N = NEED_data_typecast$E_TOT_normal ,
+  #           E_M = epc_df_cl$E_CONS_normal,
+  #           sigma_N = 1,
+  #           tn = as.numeric(NEED_data_typecast$group),
+  #           tm = as.numeric(epc_df_cl$group)
+  # ),
+  # control = list(#max_treedepth = 10,
+  #   adapt_delta = 0.8
+  # )
   #)
   
   #save(epc_priors_haringey, file="20210817_EPC_Haringey_Prior.RData")
@@ -516,10 +516,10 @@ for(i in LAD_List$LAD20CD){
   #   xlab("Energy Intensity kWh/m^2/year")+theme_minimal() + ggsave("/data/outputs/base_distribution.png", width = 16, height = 16, dpi = 200)
   
   #head(E_posterior)
-  E_posterior_all <- rbind(E_posterior_all, E_posterior_plot)
+  E_posterior_all_postcode <- rbind(E_posterior_all_postcode, E_posterior_plot)
   print(paste("Worflow Finished for LA",i))
 }
 
 #save(E_posterior_all, file="/data/outputs/base_dist_posterior.Rdata")
 
-save(E_posterior_all, file="North_East_EneInt.Rdata")
+save(E_posterior_all_postcode, file="Cambridgeshire_postcodes.Rdata")
