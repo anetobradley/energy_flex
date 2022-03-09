@@ -47,9 +47,9 @@ EPC_Cal_Request <- function(LA_no){
   search_terms <- c("bungalow","flat","house","maisonette")
   EPC_Search_Comp <- NULL
   for(i in search_terms){
-    epc_cal_req <- paste0(postcode,"&property-type=",i)
+    epc_cal_req <- paste0(LA_no,"&property-type=",i)
     carry_df <- EPC_Search(epc_cal_req)
-    EPC_Search_Comp <- rbind(EPC_Search_Comp
-    
+    EPC_Search_Comp <- rbind(EPC_Search_Comp, carry_df)
   }
+  return(EPC_Search_Comp)
 }
