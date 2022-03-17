@@ -57,3 +57,12 @@
 
 1. [Dynamic Activity Model for Energy](01-ActivityModel/)
 2. [Energy Model](02-EnergyModel/)
+                      
+## Model Development Status
+                      
+| EnergyFlex Module | Production Status | On DAFNI? |
+| --------  | ------------------- | --------------------- |
+| Population Synthesis | Completed   | No | 
+| Energy Intensity Estimation | Completed (version 2) | Yes | 
+| Energy Parameter Calibration | Testing & Debugging (not yet useable)  | No | 
+| Decarboinisation Scenario Analysis | In Development | - | 
