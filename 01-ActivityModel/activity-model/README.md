@@ -29,7 +29,7 @@ machine:
 
 ```bash
 $ git clone https://github.com/anetobradley/energy_flex.git
-$ cd energy_flex/01-ActivityModel
+$ cd energy_flex/01-ActivityModel/activity-model/
 ```
 
 This package requires a specific
