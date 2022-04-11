@@ -1,0 +1,235 @@
+################################################################################
+# In this file is listed all lookups used by the Activity Model to organize the
+# EPC data to be merged with the Synthetic Population.
+#
+################################################################################
+# EPC data info:
+# - EPCs issued from January 2008 up to and including 30 June 2021.
+# - 21,440,172 Domestic EPCs
+# - Download: 18 October 2021
+# 
+# * Note that new EPCs may include keys not listed here!
+#
+################################################################################
+# EPC Headers:
+# Each file has 90 headers (keys). In this work, the used headers are:
+# - POSTCODE
+# - LOCAL_AUTHORITY
+# - PROPERTY_TYPE + BUILT_FORM = Accommodation type
+# - CONSTRUCTION_AGE_BAND
+# - TENURE    
+# - TOTAL_FLOOR_AREA  # m²
+# - NUMBER_HABITABLE_ROOMS
+#
+################################################################################
+# Dictionary lookups:
+# keys: based on the values present in the EPC
+# keys_values: based on the values present in the Synthetic Population
+#
+################################################################################
+# List lookups (accommodation age and floor area)
+# values: arbitrary chunks
+# 
+# List layout:
+# -
+#   - chunk desired code
+#   - chunk minimum value (not included)
+#   - chunk maximum value (included)
+################################################################################
+
+## Area lookup from: https://geoportal.statistics.gov.uk/
+area_url: "https://www.arcgis.com/sharing/rest/content/items/8a824519215947da99146692b0a0ff49/data"
+
+area_in_out:
+  - "pcds"
+  - "oa11cd"
+
+accommodation:
+  'House: Detached': 2
+  'Bungalow: Detached': 2
+  'House: Semi-Detached': 3
+  'Bungalow: Semi-Detached': 3
+  'House: Mid-Terrace': 4
+  'House: End-Terrace': 4
+  'House: Enclosed Mid-Terrace': 4
+  'House: Enclosed End-Terrace': 4
+  'Bungalow: Mid-Terrace': 4
+  'Bungalow: End-Terrace': 4
+  'Bungalow: Enclosed Mid-Terrace': 4
+  'Bungalow: Enclosed End-Terrace': 4
+  'Flat: NO DATA!': 5
+  'Flat: Detached': 5
+  'Flat: Semi-Detached': 5
+  'Flat: Mid-Terrace': 5
+  'Flat: End-Terrace': 5
+  'Flat: Enclosed Mid-Terrace': 5
+  'Flat: Enclosed End-Terrace': 5
+  'Maisonette: NO DATA!': 5
+  'Maisonette: Detached': 5
+  'Maisonette: Semi-Detached': 5
+  'Maisonette: Mid-Terrace': 5
+  'Maisonette: End-Terrace': 5
+  'Maisonette: Enclosed Mid-Terrace': 5
+  'Maisonette: Enclosed End-Terrace': 5
+  'Park home: Detached': 5
+  'Park home: Semi-Detached': 5
+  'House: NO DATA!': null
+  'Bungalow: NO DATA!': null
+
+age_categorical:
+  'England and Wales: before 1900': 1
+  'England and Wales: 1900-1929': 1
+  'England and Wales: 1930-1949': 1930
+  'England and Wales: 1950-1966': 1950
+  'England and Wales: 1967-1975': 1967
+  'England and Wales: 1976-1982': 1976
+  'England and Wales: 1983-1990': 1983
+  'England and Wales: 1991-1995': 1991
+  'England and Wales: 1996-2002': 1996
+  'England and Wales: 2003-2006': 2003
+  'England and Wales: 2007-2011': 2007
+  'England and Wales: 2007 onwards': 2007
+  'England and Wales: 2012 onwards': 2007
+  INVALID!: null
+  Not applicable: null
+  NO DATA!: null
+
+
+gas:
+  N: 0
+  Y: 1
+        
+tenure:
+  Owner-occupied: 1
+  owner-occupied: 1
+  rental (social): 5
+  Rented (social): 5
+  rental (private): 6
+  Rented (private): 6
+  Not defined - use in the case of a new dwelling for which the intended tenure in not known. It is no: null
+  unknown: null
+  NO DATA!: null
+
+age_numerical:
+  -
+    - 1
+    - 0
+    - 1929
+  -
+    - 2
+    - 1929
+    - 1949
+  -
+    - 3
+    - 1949
+    - 1966
+  -
+    - 4
+    - 1966
+    - 1975
+  -
+    - 5
+    - 1975
+    - 1982
+  -
+    - 6
+    - 1982
+    - 1990
+  -
+    - 7
+    - 1990
+    - 1995
+  -
+    - 8
+    - 1995
+    - 2002
+  -
+    - 9
+    - 2002
+    - 2006
+  -
+    - 10
+    - 2006
+    - 3000
+
+floor_area:
+  -
+    - 1
+    - 0
+    - 25 
+  -
+    - 2
+    - 25
+    - 50 
+  -
+    - 3
+    - 50
+    - 75 
+  -
+    - 4
+    - 75
+    - 100 
+  -
+    - 5
+    - 100
+    - 125 
+  -
+    - 6
+    - 125
+    - 150 
+  -
+    - 7
+    - 150
+    - 175 
+  -
+    - 8
+    - 175
+    - 200 
+  -
+    - 9
+    - 200
+    - 225 
+  -
+    - 10
+    - 225
+    - 250 
+  -
+    - 11
+    - 250
+    - 275 
+  -
+    - 12
+    - 275
+    - 300 
+  -
+    - 13
+    - 300
+    - 325 
+  -
+    - 14
+    - 325
+    - 350 
+  -
+    - 15
+    - 350
+    - 375 
+  -
+    - 16
+    - 375
+    - 400 
+  -
+    - 17
+    - 400
+    - 425 
+  -
+    - 18
+    - 425
+    - 450 
+  -
+    - 19
+    - 450
+    - 475 
+  -
+    - 20
+    - 475
+    - 500
