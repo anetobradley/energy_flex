@@ -1,5 +1,6 @@
 .vscode/*
 *.ipynb_checkpoints
+*.pytest_cache*
 01-ActivityModel/data/*
 *all-domestic-certificates.zip
 *epc_england.zip

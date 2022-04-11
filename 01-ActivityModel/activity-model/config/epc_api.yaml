@@ -1,0 +1,25 @@
+################################################################################
+# Insert in this file the necessary information to download EPC data using API.
+#
+################################################################################
+
+#  EPC credentials
+epc_user: "user@email"
+epc_key: "user_key"
+
+epc_url: "https://epc.opendatacommunities.org/api/v1/domestic/search?"
+
+epc_years:
+  - 2008
+  - 2022
+
+epc_headers:
+  - "postcode"
+  - "property-type"
+  - "built-form"
+  - "construction-age-band"
+  - "tenure"
+  - "total-floor-area"
+  - "mains-gas-flag"
+  - "building-reference-number"
+  - "lodgement-datetime"

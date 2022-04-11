@@ -1,0 +1,8 @@
+################################################################################
+# Insert in this file the local authority codes (lad_codes) of your interest.
+# The default is Haringey.
+#
+################################################################################
+
+lad_codes:
+  - E09000014
