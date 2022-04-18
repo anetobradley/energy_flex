@@ -4,7 +4,7 @@ from data_preparation import Epc, Spenser
 from enriching_population import EnrichingPopulation
 
 if __name__ == "__main__":
-    print("Running the Activity model process, this can take a while, depending on how many areas you have added.")
+    print("hi")
     spenser = Spenser()
     epc = Epc()
     psm = EnrichingPopulation()
