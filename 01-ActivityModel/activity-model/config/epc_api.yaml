@@ -4,8 +4,8 @@
 ################################################################################
 
 #  EPC credentials
-epc_user: "user@email"
-epc_key: "user_key"
+epc_user: "fbenitez@turing.ac.uk"
+epc_key: "835bf8345666a63362b6f327dc138b8c78a2d80d"
 
 epc_url: "https://epc.opendatacommunities.org/api/v1/domestic/search?"
 

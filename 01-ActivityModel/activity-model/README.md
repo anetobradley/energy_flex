@@ -29,7 +29,7 @@ machine:
 
 ```bash
 $ git clone https://github.com/anetobradley/energy_flex.git
-$ cd energy_flex/01-ActivityModel/activity-model/
+$ cd 01-ActivityModel/activity-model/
 ```
 
 This package requires a specific
@@ -59,6 +59,7 @@ $ nano config/user.yaml
 #  EPC credentials
 epc_user: "user@email"
 epc_key: "user_key"
+# the epc key can be found at the bottom of the https://epc.opendatacommunities.org/ website next to the email you have used to log in.
 ```
 
 #### Local Authority codes

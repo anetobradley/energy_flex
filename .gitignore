@@ -13,3 +13,5 @@
 02-EnergyModel/*.tar.gz
 02-EnergyModel/*.tar
 02-EnergyModel/*.Rhistory
+*.egg-info
+*__pycache__
