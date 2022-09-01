@@ -1,4 +1,4 @@
-# Bayesian Calibration:  <!-- omit in toc -->
+# Bayesian Calibration (In Development) <!-- omit in toc -->
 
 Here we present the steps taken to infer a posterior energy intensity distribution by household typology, using NEED and EPC data.
 
