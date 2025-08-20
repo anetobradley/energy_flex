@@ -1,0 +1,17 @@
+################################################################################
+# Insert in this file the necessary information to configure the 
+# EnrichingPopulation class.
+#
+################################################################################
+
+n_neighbors: 200
+
+overlap_columns:
+  - "LC4402_C_TYPACCOM"
+  - "tenure"
+  - "Area_factor"
+
+matches_columns:
+  - "FLOOR_AREA"
+  - "GAS"
+  - "ACCOM_AGE"
